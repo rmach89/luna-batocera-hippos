@@ -6,7 +6,9 @@ Play **Amazon Luna** from the EmulationStation carousel on [Batocera](https://ba
 
 > **Unofficial project, use at your own risk.** Not affiliated with, endorsed by or sponsored by Amazon. Amazon, Amazon Luna, Luna and Prime are trademarks of Amazon.com, Inc. or its affiliates.
 
-![The Settings screen](docs/images/settings.png)
+[![Watch the 25-second showcase video](docs/images/video-preview.jpg)](docs/luna-showcase.mp4)
+
+▶ **[Watch the 25-second showcase video](docs/luna-showcase.mp4)**
 
 What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
@@ -35,6 +37,16 @@ What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 - Amazon Luna itself always stays at the top of the list.
 
 **Launch Single Game** (optional): picking Amazon Luna in the carousel opens the app straight away, and closing it takes you back to the carousel.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Made for your controller: the welcome screen](docs/images/2-welcome.jpg) | ![Settings, all on the controller](docs/images/3-settings.jpg) |
+| ![Sharper on a 4K TV: the picture settings](docs/images/4-picture.jpg) | ![Luna's games in your game list](docs/images/5-gamelist.jpg) |
+| ![Right in the F1 menu](docs/images/6-f1-menu.jpg) | |
+
+The welcome and Settings screens are the app's own; the F1 menu is a mock-up (Batocera draws that menu in its own style).
 
 ## What you need
 
