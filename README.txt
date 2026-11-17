@@ -1,6 +1,6 @@
 AMAZON LUNA for Batocera & HippOS
 =================================
-Version 1.0.0 (November 2026)
+Version 1.0.1 (November 2026)
 Home page and new versions: https://github.com/rmach89/luna-batocera-hippos
 
 An unofficial, fan-made app, used at your own risk. It is not made,
@@ -96,7 +96,8 @@ Other Amazon pages (sign-in, Prime sign-up, your account): a "Back to
 Amazon Luna" bar sits at the top. Press View / Select, or the Home key.
 
 Quick settings in a game: hold LB + RB + View for a second (F9 on a
-keyboard). Volume, stream stats and the picture options, over the game.
+keyboard). Volume, stream stats, the picture options, 4K upscaling and
+video clean-up, over the game.
 Its first row takes a screenshot (also PrintScreen on a keyboard), saved
 in /userdata/screenshots.
 
@@ -117,12 +118,19 @@ General
     Austria and Luxembourg use Germany's.
   Language of the app's own screens (Same as Batocera by default).
   Volume, Light up keys when typing, Intro video and its sound,
-  Low-power settings (sharpening, Clarity boost and stream stats off).
+  Low-power settings (sharpening, Clarity boost, stream stats, 4K
+  upscaling and video clean-up off).
 Stream
   GPU acceleration (applies the next time the app opens; turn it off if
     the screen flickers or goes black), Stream stats.
 Picture
-  Sharpening, Clarity boost, Contrast, Colour saturation, Brightness.
+  Sharpening.
+  4K upscaling (64-bit PCs): Luna sends at most 1080p; this draws the game
+    at your screen's full resolution and sharpens it on the graphics chip.
+    Upscaling size (screen, 1080p, 1440p or 4K) and Upscaling sharpness
+    show once it's on.
+  Video clean-up: softens compression blocks in flat areas.
+  Clarity boost, Contrast, Colour saturation, Brightness.
 Controller
   Controls (every button and key), Move around Luna with the app,
   Controller battery.
@@ -185,8 +193,8 @@ for a reinstall. Add --all to remove everything without questions.
 Troubleshooting
 ---------------
 Black, flickering or broken picture: hold LB + RB for two seconds while
-the app opens (safe mode). GPU acceleration, sharpening and the picture
-adjustments turn off. Or run: bash /userdata/system/add-ons/luna/Run-App.sh --safe
+the app opens (safe mode). GPU acceleration, 4K upscaling, video
+clean-up, sharpening and the picture adjustments turn off. Or run: bash /userdata/system/add-ons/luna/Run-App.sh --safe
 
 "Browser not supported" on Luna: the app tells Luna it's Chrome on
 Windows. If Luna still says so, Settings > Help and maintenance >

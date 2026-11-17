@@ -2,6 +2,12 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Download them from [Releases](https://github.com/rmach89/luna-batocera-hippos/releases).
 
+## 1.0.1
+
+- 4K upscaling is back (64-bit PCs): Luna sends at most 1080p, and the upscaler draws the game at your TV's full resolution and sharpens it on the graphics chip. Its size and sharpness are in Settings > Picture and in quick settings.
+- Video clean-up is back: softens the blocks compression leaves in flat areas.
+- Both are in quick settings during a game too, and safe mode and the low-power settings turn them off.
+
 ## 1.0.0
 
 First version, built from the Xbox Cloud Gaming add-on (v1.2.8).
@@ -12,4 +18,4 @@ First version, built from the Xbox Cloud Gaming add-on (v1.2.8).
 - Picture options (sharpening, Clarity boost, contrast, saturation, brightness), stream stats, quick settings and screenshots in a game.
 - Settings > Controller > Move around Luna with the app, in case Luna's pages don't follow the controller on your setup.
 - Back up and restore, safe mode, low-power settings, updates from Settings, logs for help.
-- Not carried over from the Xbox app (they relied on how Xbox's site works): resolution, region unlock, split screen, profiles, 3D game boxes, instant replay, 4K upscaling and the Xbox dashboard options.
+- Not carried over from the Xbox app (they relied on how Xbox's site works): resolution, region unlock, split screen, profiles, 3D game boxes, instant replay and the Xbox dashboard options.

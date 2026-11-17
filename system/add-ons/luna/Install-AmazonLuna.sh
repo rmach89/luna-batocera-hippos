@@ -446,7 +446,7 @@ cat > "$APPS/luna-settings.desktop" <<DESKTOP_EOF
 Version=1.0
 Type=Application
 Name=Amazon Luna Settings
-Comment=Region, volume and key highlights
+Comment=Region, picture, game list and more
 Exec=/bin/bash $FILES/Launch-AmazonLuna.sh --settings
 Icon=$FILES/luna-settings-icon.png
 Terminal=false

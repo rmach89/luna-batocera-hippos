@@ -467,7 +467,7 @@
   }, 1000);
 
   // ---------- 4K upscaler (64-bit PCs) ----------
-  // The game's picture (1080p or 1440p: Xbox sends no more) is drawn on a
+  // The game's picture (Luna sends at most 1080p) is drawn on a
   // canvas at the screen's full resolution by the graphics chip, with
   // contrast-adaptive sharpening (the AMD FidelityFX CAS method), instead of
   // the browser's plain stretch. Sharper on a 4K screen; uses more of the GPU.
@@ -562,7 +562,7 @@
     if (UP.vid === v) return;
     try { if (!UP.gl) upSetup(); } catch (e) { UP.failed = true; say('4K upscaler not available: ' + e.message); return; }
     upOff(); UP.vid = v;
-    // right after the game's video, so Xbox's own buttons stay on top of it
+    // right after the game's video, so Luna's own buttons stay on top of it
     if (UP.cv.parentNode !== v.parentNode || UP.cv.previousSibling !== v) v.parentNode.insertBefore(UP.cv, v.nextSibling);
     upLoop(v);
   }, 500);

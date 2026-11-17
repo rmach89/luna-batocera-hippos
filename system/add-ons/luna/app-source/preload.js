@@ -651,6 +651,11 @@ const QP_ROWS = [
   { k: 'sa', t: 'saT', min: 50, max: 150, step: 5, def: 100 },
   { k: 'ct', t: 'ctT', min: 50, max: 150, step: 5, def: 100 },
   { k: 'br', t: 'brT', min: 50, max: 150, step: 5, def: 100 },
+  { k: 'clean', t: 'cleanT', toggle: true, def: false },
+  // the upscaler (64-bit PCs)
+  { k: 'up', t: 'upT', toggle: true, def: false, x64: true },
+  { k: 'upTarget', t: 'utT', list: ['screen', '1080', '1440', '2160'], def: 'screen', x64: true },
+  { k: 'upSharp', t: 'usT', min: 0, max: 100, step: 10, def: 60, x64: true }
 ];
 let QP_ITEMS = QP_ROWS.filter(r => r.k);
 const QP_CSS = `

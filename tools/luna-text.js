@@ -12,12 +12,13 @@ module.exports = {
     glAll: 'All Luna games',
     glHelpAll: "Every game on Luna shows in EmulationStation's Luna list with its picture and description; picking one opens it",
     ptS1: "On Luna, open a game's page (select its tile)",
-    lowHelp: 'For slower devices: sharpening, clarity boost and stream stats off',
-    lpQ: 'This looks like a smaller ARM device. Turn on the low-power settings? Sharpening, clarity boost and stream stats off. You can change them in Settings at any time.',
+    lowHelp: "For slower devices: sharpening, clarity boost, stream stats, 4K upscaling and video clean-up off",
+    lpQ: "This looks like a smaller ARM device. Turn on the low-power settings? Sharpening, clarity boost, stream stats, 4K upscaling and video clean-up off. You can change them in Settings at any time.",
     c4b: '{view} on other pages (sign-in, Prime sign-up) · keyboard: Home',
     c8b: 'Your controller works in games and on Luna itself',
     dnavT: 'Move around Luna with the app',
-    dnavHelp: "Luna's own pages follow the controller by themselves. If they don't, turn this on: the D-pad moves, A selects, B goes back"
+    dnavHelp: "Luna's own pages follow the controller by themselves. If they don't, turn this on: the D-pad moves, A selects, B goes back",
+    upHelp: "Draws the game at your screen's full resolution and sharpens it, for 4K TVs (Luna sends at most 1080p). Uses more of the GPU"
   },
   fr: {
     secAcct: 'Compte',
@@ -29,12 +30,13 @@ module.exports = {
     glAll: 'Tous les jeux Luna',
     glHelpAll: "Chaque jeu de Luna apparaît dans la liste Luna d'EmulationStation avec son image et sa description ; le choisir l'ouvre",
     ptS1: "Sur Luna, ouvrez la page d'un jeu (sélectionnez sa vignette)",
-    lowHelp: "Pour les appareils plus lents : netteté, clarté renforcée et statistiques du flux désactivées",
+    lowHelp: "Pour les appareils plus lents : netteté, clarté renforcée, statistiques du flux, mise à l'échelle 4K et nettoyage vidéo désactivés",
     lpQ: "Cet appareil semble être un petit appareil ARM. Activer les réglages basse consommation ? Netteté, clarté renforcée et statistiques du flux désactivées. Vous pouvez les modifier à tout moment dans Paramètres.",
     c4b: "{view} sur les autres pages (connexion, inscription Prime) · clavier : Origine",
     c8b: 'Votre manette fonctionne dans les jeux et sur Luna',
     dnavT: "Naviguer dans Luna avec l'application",
-    dnavHelp: "Les pages de Luna suivent la manette d'elles-mêmes. Sinon, activez ceci : la croix déplace, A sélectionne, B revient"
+    dnavHelp: "Les pages de Luna suivent la manette d'elles-mêmes. Sinon, activez ceci : la croix déplace, A sélectionne, B revient",
+    upHelp: "Affiche le jeu à la pleine résolution de l'écran et l'affine, pour les téléviseurs 4K (Luna envoie au plus du 1080p). Sollicite davantage le GPU"
   },
   es: {
     secAcct: 'Cuenta',
@@ -46,12 +48,13 @@ module.exports = {
     glAll: 'Todos los juegos de Luna',
     glHelpAll: 'Cada juego de Luna aparece en la lista de Luna de EmulationStation con su imagen y descripción; al elegirlo se abre',
     ptS1: 'En Luna, abre la página de un juego (selecciona su icono)',
-    lowHelp: 'Para dispositivos más lentos: nitidez, claridad mejorada y estadísticas del streaming desactivadas',
+    lowHelp: "Para dispositivos más lentos: nitidez, claridad mejorada, estadísticas del streaming, escalado 4K y limpieza de vídeo desactivados",
     lpQ: 'Parece un dispositivo ARM pequeño. ¿Activar los ajustes de bajo consumo? Nitidez, claridad mejorada y estadísticas del streaming desactivadas. Puedes cambiarlos en Ajustes cuando quieras.',
     c4b: '{view} en otras páginas (inicio de sesión, alta en Prime) · teclado: Inicio',
     c8b: 'Tu mando funciona en los juegos y en Luna',
     dnavT: 'Moverse por Luna con la app',
-    dnavHelp: 'Las páginas de Luna siguen el mando por sí solas. Si no, activa esto: la cruceta mueve, A selecciona, B vuelve'
+    dnavHelp: 'Las páginas de Luna siguen el mando por sí solas. Si no, activa esto: la cruceta mueve, A selecciona, B vuelve',
+    upHelp: "Muestra el juego a la resolución completa de la pantalla y lo enfoca, para televisores 4K (Luna envía como máximo 1080p). Usa más la GPU"
   },
   'pt-BR': {
     secAcct: 'Conta',
@@ -63,12 +66,13 @@ module.exports = {
     glAll: 'Todos os jogos do Luna',
     glHelpAll: 'Cada jogo do Luna aparece na lista do Luna no EmulationStation com imagem e descrição; escolher um o abre',
     ptS1: 'No Luna, abra a página de um jogo (selecione o bloco dele)',
-    lowHelp: 'Para aparelhos mais lentos: nitidez, clareza extra e estatísticas do stream desligadas',
+    lowHelp: "Para aparelhos mais lentos: nitidez, clareza extra, estatísticas do stream, upscaling 4K e limpeza de vídeo desligados",
     lpQ: 'Parece um aparelho ARM menor. Ativar as configurações de baixo consumo? Nitidez, clareza extra e estatísticas do stream desligadas. Você pode mudar isso nas Configurações a qualquer momento.',
     c4b: '{view} nas outras páginas (login, assinatura Prime) · teclado: Home',
     c8b: 'Seu controle funciona nos jogos e no próprio Luna',
     dnavT: 'Navegar no Luna com o app',
-    dnavHelp: 'As páginas do Luna seguem o controle sozinhas. Se não seguirem, ative isto: o direcional move, A seleciona, B volta'
+    dnavHelp: 'As páginas do Luna seguem o controle sozinhas. Se não seguirem, ative isto: o direcional move, A seleciona, B volta',
+    upHelp: "Mostra o jogo na resolução total da tela e deixa mais nítido, para TVs 4K (o Luna envia no máximo 1080p). Usa mais a GPU"
   },
   'pt-PT': {
     secAcct: 'Conta',
@@ -80,12 +84,13 @@ module.exports = {
     glAll: 'Todos os jogos do Luna',
     glHelpAll: 'Cada jogo do Luna aparece na lista do Luna no EmulationStation com imagem e descrição; escolher um abre-o',
     ptS1: 'No Luna, abra a página de um jogo (selecione o seu mosaico)',
-    lowHelp: 'Para dispositivos mais lentos: nitidez, clareza extra e estatísticas do stream desligadas',
+    lowHelp: "Para dispositivos mais lentos: nitidez, clareza extra, estatísticas do stream, upscaling 4K e limpeza de vídeo desligados",
     lpQ: 'Parece um dispositivo ARM mais pequeno. Ativar as definições de baixo consumo? Nitidez, clareza extra e estatísticas do stream desligadas. Pode alterá-las nas Definições a qualquer momento.',
     c4b: '{view} nas outras páginas (início de sessão, adesão ao Prime) · teclado: Home',
     c8b: 'O seu comando funciona nos jogos e no próprio Luna',
     dnavT: 'Navegar no Luna com a app',
-    dnavHelp: 'As páginas do Luna seguem o comando sozinhas. Se não seguirem, ative isto: o direcional move, A seleciona, B volta'
+    dnavHelp: 'As páginas do Luna seguem o comando sozinhas. Se não seguirem, ative isto: o direcional move, A seleciona, B volta',
+    upHelp: "Mostra o jogo à resolução total do ecrã e torna-o mais nítido, para televisores 4K (o Luna envia no máximo 1080p). Usa mais a GPU"
   },
   de: {
     secAcct: 'Konto',
@@ -97,12 +102,13 @@ module.exports = {
     glAll: 'Alle Luna-Spiele',
     glHelpAll: 'Jedes Spiel auf Luna erscheint in der Luna-Liste von EmulationStation mit Bild und Beschreibung; ein Spiel auswählen öffnet es',
     ptS1: 'Öffne auf Luna die Seite eines Spiels (wähle seine Kachel)',
-    lowHelp: 'Für langsamere Geräte: Schärfe, Klarheitsverstärkung und Stream-Statistiken aus',
+    lowHelp: "Für langsamere Geräte: Schärfe, Klarheitsverstärkung, Stream-Statistiken, 4K-Hochskalierung und Video-Bereinigung aus",
     lpQ: 'Das sieht nach einem kleineren ARM-Gerät aus. Energiesparende Einstellungen einschalten? Schärfe, Klarheitsverstärkung und Stream-Statistiken aus. Du kannst sie jederzeit in den Einstellungen ändern.',
     c4b: '{view} auf anderen Seiten (Anmeldung, Prime-Anmeldung) · Tastatur: Pos1',
     c8b: 'Dein Controller funktioniert in Spielen und auf Luna selbst',
     dnavT: 'Luna mit der App bedienen',
-    dnavHelp: 'Die Seiten von Luna folgen dem Controller von selbst. Falls nicht, schalte dies ein: Steuerkreuz bewegt, A wählt, B geht zurück'
+    dnavHelp: 'Die Seiten von Luna folgen dem Controller von selbst. Falls nicht, schalte dies ein: Steuerkreuz bewegt, A wählt, B geht zurück',
+    upHelp: "Zeigt das Spiel in der vollen Auflösung des Bildschirms und schärft es, für 4K-Fernseher (Luna sendet höchstens 1080p). Beansprucht die GPU stärker"
   },
   it: {
     secAcct: 'Account',
@@ -114,12 +120,13 @@ module.exports = {
     glAll: 'Tutti i giochi Luna',
     glHelpAll: "Ogni gioco di Luna compare nell'elenco Luna di EmulationStation con immagine e descrizione; sceglierne uno lo apre",
     ptS1: 'Su Luna, apri la pagina di un gioco (seleziona il suo riquadro)',
-    lowHelp: 'Per dispositivi più lenti: nitidezza, chiarezza extra e statistiche dello streaming disattivate',
+    lowHelp: "Per dispositivi più lenti: nitidezza, chiarezza extra, statistiche dello streaming, upscaling 4K e pulizia video disattivati",
     lpQ: 'Sembra un dispositivo ARM più piccolo. Attivare le impostazioni a basso consumo? Nitidezza, chiarezza extra e statistiche dello streaming disattivate. Puoi cambiarle in Impostazioni in qualsiasi momento.',
     c4b: '{view} nelle altre pagine (accesso, iscrizione Prime) · tastiera: Home',
     c8b: 'Il controller funziona nei giochi e su Luna stessa',
     dnavT: "Muoversi in Luna con l'app",
-    dnavHelp: 'Le pagine di Luna seguono il controller da sole. Se non lo fanno, attiva questa opzione: la croce sposta, A seleziona, B torna indietro'
+    dnavHelp: 'Le pagine di Luna seguono il controller da sole. Se non lo fanno, attiva questa opzione: la croce sposta, A seleziona, B torna indietro',
+    upHelp: "Mostra il gioco alla risoluzione piena dello schermo e lo rende più nitido, per TV 4K (Luna invia al massimo 1080p). Usa di più la GPU"
   },
   nl: {
     secAcct: 'Account',
@@ -131,12 +138,13 @@ module.exports = {
     glAll: 'Alle Luna-games',
     glHelpAll: 'Elke game op Luna staat in de Luna-lijst van EmulationStation met afbeelding en beschrijving; kies er een om hem te openen',
     ptS1: 'Open op Luna de pagina van een game (selecteer de tegel)',
-    lowHelp: 'Voor tragere apparaten: verscherping, extra helderheid en streamstatistieken uit',
+    lowHelp: "Voor tragere apparaten: verscherping, extra helderheid, streamstatistieken, 4K-opschaling en video-opschoning uit",
     lpQ: 'Dit lijkt een kleiner ARM-apparaat. Zuinige instellingen aanzetten? Verscherping, extra helderheid en streamstatistieken uit. Je kunt ze altijd wijzigen in Instellingen.',
     c4b: '{view} op andere pagina\'s (aanmelden, Prime-aanmelding) · toetsenbord: Home',
     c8b: 'Je controller werkt in games en op Luna zelf',
     dnavT: 'Door Luna bewegen met de app',
-    dnavHelp: "De pagina's van Luna volgen de controller zelf. Zo niet, zet dit aan: de D-pad beweegt, A selecteert, B gaat terug"
+    dnavHelp: "De pagina's van Luna volgen de controller zelf. Zo niet, zet dit aan: de D-pad beweegt, A selecteert, B gaat terug",
+    upHelp: "Toont het spel op de volle resolutie van je scherm en maakt het scherper, voor 4K-tv's (Luna stuurt hooguit 1080p). Gebruikt de GPU meer"
   },
   da: {
     secAcct: 'Konto',
@@ -148,12 +156,13 @@ module.exports = {
     glAll: 'Alle Luna-spil',
     glHelpAll: 'Alle spil på Luna vises i EmulationStations Luna-liste med billede og beskrivelse; vælg et for at åbne det',
     ptS1: 'Åbn et spils side på Luna (vælg dets felt)',
-    lowHelp: 'Til langsommere enheder: skarphed, ekstra klarhed og streamstatistik slået fra',
+    lowHelp: "Til langsommere enheder: skarphed, ekstra klarhed, streamstatistik, 4K-opskalering og videooprydning slået fra",
     lpQ: 'Det ligner en mindre ARM-enhed. Slå strømbesparende indstillinger til? Skarphed, ekstra klarhed og streamstatistik slået fra. Du kan altid ændre dem i Indstillinger.',
     c4b: '{view} på andre sider (login, Prime-tilmelding) · tastatur: Home',
     c8b: 'Din controller virker i spil og på selve Luna',
     dnavT: 'Bevæg dig rundt i Luna med appen',
-    dnavHelp: 'Lunas egne sider følger selv controlleren. Hvis ikke, så slå dette til: D-pad flytter, A vælger, B går tilbage'
+    dnavHelp: 'Lunas egne sider følger selv controlleren. Hvis ikke, så slå dette til: D-pad flytter, A vælger, B går tilbage',
+    upHelp: "Viser spillet i skærmens fulde opløsning og gør det skarpere, til 4K-tv (Luna sender højst 1080p). Bruger GPU'en mere"
   },
   fi: {
     secAcct: 'Tili',
@@ -165,12 +174,13 @@ module.exports = {
     glAll: 'Kaikki Luna-pelit',
     glHelpAll: 'Jokainen Lunan peli näkyy EmulationStationin Luna-listassa kuvan ja kuvauksen kanssa; valitse peli avataksesi sen',
     ptS1: 'Avaa Lunassa pelin sivu (valitse sen ruutu)',
-    lowHelp: 'Hitaammille laitteille: terävöitys, selkeyden tehostus ja striimin tilastot pois päältä',
+    lowHelp: "Hitaammille laitteille: terävöitys, selkeyden tehostus, striimin tilastot, 4K-skaalaus ja videon siistiminen pois päältä",
     lpQ: 'Tämä näyttää pienemmältä ARM-laitteelta. Otetaanko virransäästöasetukset käyttöön? Terävöitys, selkeyden tehostus ja striimin tilastot pois päältä. Voit muuttaa niitä asetuksissa milloin tahansa.',
     c4b: '{view} muilla sivuilla (kirjautuminen, Prime-tilaus) · näppäimistö: Home',
     c8b: 'Ohjain toimii peleissä ja itse Lunassa',
     dnavT: 'Liiku Lunassa sovelluksen avulla',
-    dnavHelp: 'Lunan sivut seuraavat ohjainta itsestään. Jos eivät, ota tämä käyttöön: ristiohjain liikkuu, A valitsee, B palaa'
+    dnavHelp: 'Lunan sivut seuraavat ohjainta itsestään. Jos eivät, ota tämä käyttöön: ristiohjain liikkuu, A valitsee, B palaa',
+    upHelp: "Näyttää pelin näytön täydellä tarkkuudella ja terävöittää sen, 4K-televisioille (Luna lähettää enintään 1080p). Kuormittaa näytönohjainta enemmän"
   },
   nb: {
     secAcct: 'Konto',
@@ -182,12 +192,13 @@ module.exports = {
     glAll: 'Alle Luna-spill',
     glHelpAll: 'Alle spill på Luna vises i EmulationStations Luna-liste med bilde og beskrivelse; velg ett for å åpne det',
     ptS1: 'Åpne siden til et spill på Luna (velg flisen)',
-    lowHelp: 'For tregere enheter: skarphet, ekstra klarhet og strømmestatistikk av',
+    lowHelp: "For tregere enheter: skarphet, ekstra klarhet, strømmestatistikk, 4K-oppskalering og videorydding av",
     lpQ: 'Dette ser ut som en mindre ARM-enhet. Slå på strømsparende innstillinger? Skarphet, ekstra klarhet og strømmestatistikk av. Du kan endre dem i Innstillinger når som helst.',
     c4b: '{view} på andre sider (pålogging, Prime-registrering) · tastatur: Home',
     c8b: 'Kontrolleren din virker i spill og på selve Luna',
     dnavT: 'Naviger i Luna med appen',
-    dnavHelp: 'Lunas egne sider følger kontrolleren selv. Hvis ikke, slå på dette: D-paden flytter, A velger, B går tilbake'
+    dnavHelp: 'Lunas egne sider følger kontrolleren selv. Hvis ikke, slå på dette: D-paden flytter, A velger, B går tilbake',
+    upHelp: "Viser spillet i skjermens fulle oppløsning og gjør det skarpere, for 4K-TV (Luna sender maks 1080p). Bruker GPU-en mer"
   },
   sv: {
     secAcct: 'Konto',
@@ -199,12 +210,13 @@ module.exports = {
     glAll: 'Alla Luna-spel',
     glHelpAll: 'Alla spel på Luna visas i EmulationStations Luna-lista med bild och beskrivning; välj ett för att öppna det',
     ptS1: 'Öppna ett spels sida på Luna (välj dess ruta)',
-    lowHelp: 'För långsammare enheter: skärpa, extra klarhet och streamstatistik av',
+    lowHelp: "För långsammare enheter: skärpa, extra klarhet, streamstatistik, 4K-uppskalning och videorensning av",
     lpQ: 'Det här ser ut som en mindre ARM-enhet. Slå på energisparinställningarna? Skärpa, extra klarhet och streamstatistik av. Du kan ändra dem i Inställningar när som helst.',
     c4b: '{view} på andra sidor (inloggning, Prime-registrering) · tangentbord: Home',
     c8b: 'Din handkontroll fungerar i spel och på själva Luna',
     dnavT: 'Navigera i Luna med appen',
-    dnavHelp: 'Lunas egna sidor följer handkontrollen själva. Om inte, slå på detta: styrkorset flyttar, A väljer, B går tillbaka'
+    dnavHelp: 'Lunas egna sidor följer handkontrollen själva. Om inte, slå på detta: styrkorset flyttar, A väljer, B går tillbaka',
+    upHelp: "Visar spelet i skärmens fulla upplösning och gör det skarpare, för 4K-tv (Luna skickar högst 1080p). Belastar GPU:n mer"
   },
   pl: {
     secAcct: 'Konto',
@@ -216,12 +228,13 @@ module.exports = {
     glAll: 'Wszystkie gry Luna',
     glHelpAll: 'Każda gra z Luna pojawia się na liście Luna w EmulationStation z obrazem i opisem; wybranie gry ją otwiera',
     ptS1: 'W Luna otwórz stronę gry (wybierz jej kafelek)',
-    lowHelp: 'Dla wolniejszych urządzeń: wyostrzanie, dodatkowa wyrazistość i statystyki strumienia wyłączone',
+    lowHelp: "Dla wolniejszych urządzeń: wyostrzanie, dodatkowa wyrazistość, statystyki strumienia, skalowanie 4K i oczyszczanie obrazu wyłączone",
     lpQ: 'To wygląda na mniejsze urządzenie ARM. Włączyć ustawienia oszczędzania energii? Wyostrzanie, dodatkowa wyrazistość i statystyki strumienia wyłączone. Możesz je zmienić w Ustawieniach w każdej chwili.',
     c4b: '{view} na innych stronach (logowanie, rejestracja Prime) · klawiatura: Home',
     c8b: 'Kontroler działa w grach i w samej Luna',
     dnavT: 'Poruszanie się po Luna za pomocą aplikacji',
-    dnavHelp: 'Strony Luna same reagują na kontroler. Jeśli nie, włącz to: krzyżak przesuwa, A wybiera, B wraca'
+    dnavHelp: 'Strony Luna same reagują na kontroler. Jeśli nie, włącz to: krzyżak przesuwa, A wybiera, B wraca',
+    upHelp: "Wyświetla grę w pełnej rozdzielczości ekranu i wyostrza ją, dla telewizorów 4K (Luna wysyła najwyżej 1080p). Bardziej obciąża GPU"
   },
   cs: {
     secAcct: 'Účet',
@@ -233,12 +246,13 @@ module.exports = {
     glAll: 'Všechny hry Luna',
     glHelpAll: 'Každá hra z Luny se zobrazí v seznamu Luna v EmulationStation s obrázkem a popisem; výběrem se otevře',
     ptS1: 'Na Luně otevřete stránku hry (vyberte její dlaždici)',
-    lowHelp: 'Pro pomalejší zařízení: doostření, vyšší jasnost a statistiky streamu vypnuty',
+    lowHelp: "Pro pomalejší zařízení: doostření, vyšší jasnost, statistiky streamu, 4K upscaling a čištění obrazu vypnuty",
     lpQ: 'Vypadá to na menší zařízení ARM. Zapnout úsporná nastavení? Doostření, vyšší jasnost a statistiky streamu vypnuty. V Nastavení je můžete kdykoli změnit.',
     c4b: '{view} na jiných stránkách (přihlášení, registrace Prime) · klávesnice: Home',
     c8b: 'Ovladač funguje ve hrách i na samotné Luně',
     dnavT: 'Pohyb po Luně pomocí aplikace',
-    dnavHelp: 'Stránky Luny reagují na ovladač samy. Pokud ne, zapněte toto: křížový ovladač pohybuje, A vybírá, B se vrací'
+    dnavHelp: 'Stránky Luny reagují na ovladač samy. Pokud ne, zapněte toto: křížový ovladač pohybuje, A vybírá, B se vrací',
+    upHelp: "Zobrazí hru v plném rozlišení obrazovky a zaostří ji, pro 4K televize (Luna posílá nejvýš 1080p). Víc zatěžuje GPU"
   },
   sk: {
     secAcct: 'Účet',
@@ -250,12 +264,13 @@ module.exports = {
     glAll: 'Všetky hry Luna',
     glHelpAll: 'Každá hra z Luny sa zobrazí v zozname Luna v EmulationStation s obrázkom a popisom; výberom sa otvorí',
     ptS1: 'Na Lune otvorte stránku hry (vyberte jej dlaždicu)',
-    lowHelp: 'Pre pomalšie zariadenia: zaostrenie, vyššia jasnosť a štatistiky streamu vypnuté',
+    lowHelp: "Pre pomalšie zariadenia: zaostrenie, vyššia jasnosť, štatistiky streamu, 4K upscaling a čistenie obrazu vypnuté",
     lpQ: 'Vyzerá to na menšie zariadenie ARM. Zapnúť úsporné nastavenia? Zaostrenie, vyššia jasnosť a štatistiky streamu vypnuté. V Nastaveniach ich môžete kedykoľvek zmeniť.',
     c4b: '{view} na iných stránkach (prihlásenie, registrácia Prime) · klávesnica: Home',
     c8b: 'Ovládač funguje v hrách aj na samotnej Lune',
     dnavT: 'Pohyb po Lune pomocou aplikácie',
-    dnavHelp: 'Stránky Luny reagujú na ovládač samy. Ak nie, zapnite toto: smerový ovládač pohybuje, A vyberá, B sa vracia'
+    dnavHelp: 'Stránky Luny reagujú na ovládač samy. Ak nie, zapnite toto: smerový ovládač pohybuje, A vyberá, B sa vracia',
+    upHelp: "Zobrazí hru v plnom rozlíšení obrazovky a zaostrí ju, pre 4K televízory (Luna posiela najviac 1080p). Viac zaťažuje GPU"
   },
   hu: {
     secAcct: 'Fiók',
@@ -267,12 +282,13 @@ module.exports = {
     glAll: 'Minden Luna-játék',
     glHelpAll: 'A Luna minden játéka megjelenik az EmulationStation Luna-listájában képpel és leírással; egy kiválasztása megnyitja',
     ptS1: 'A Lunán nyisd meg egy játék oldalát (válaszd ki a csempéjét)',
-    lowHelp: 'Lassabb eszközökhöz: élesítés, extra tisztaság és streamstatisztika kikapcsolva',
+    lowHelp: "Lassabb eszközökhöz: élesítés, extra tisztaság, streamstatisztika, 4K felskálázás és videótisztítás kikapcsolva",
     lpQ: 'Ez kisebb ARM-eszköznek tűnik. Bekapcsolod az energiatakarékos beállításokat? Élesítés, extra tisztaság és streamstatisztika kikapcsolva. Bármikor módosíthatod őket a Beállításokban.',
     c4b: '{view} a többi oldalon (bejelentkezés, Prime-regisztráció) · billentyűzet: Home',
     c8b: 'A kontroller működik a játékokban és magán a Lunán is',
     dnavT: 'Mozgás a Lunán az alkalmazással',
-    dnavHelp: 'A Luna oldalai maguktól követik a kontrollert. Ha nem, kapcsold be: a D-pad mozgat, az A kiválaszt, a B visszalép'
+    dnavHelp: 'A Luna oldalai maguktól követik a kontrollert. Ha nem, kapcsold be: a D-pad mozgat, az A kiválaszt, a B visszalép',
+    upHelp: "A képernyő teljes felbontásán jeleníti meg a játékot, és élesebbé teszi, 4K tévékhez (a Luna legfeljebb 1080p-t küld). Jobban terheli a GPU-t"
   },
   ja: {
     secAcct: 'アカウント',
@@ -284,12 +300,13 @@ module.exports = {
     glAll: 'すべての Luna ゲーム',
     glHelpAll: 'Luna のすべてのゲームが画像と説明付きで EmulationStation の Luna リストに表示され、選ぶと開きます',
     ptS1: 'Luna でゲームのページを開きます（タイルを選択）',
-    lowHelp: '遅い機器向け：シャープ、クラリティ強化、ストリーム統計をオフ',
+    lowHelp: "遅い機器向け：シャープ、クラリティ強化、ストリーム統計、4K アップスケール、映像クリーンアップをオフ",
     lpQ: '小型の ARM 機器のようです。省電力設定をオンにしますか？シャープ、クラリティ強化、ストリーム統計をオフにします。設定でいつでも変更できます。',
     c4b: '他のページ（サインイン、Prime 登録）では {view}・キーボード：Home',
     c8b: 'コントローラーはゲームでも Luna 自体でも使えます',
     dnavT: 'アプリで Luna を操作',
-    dnavHelp: 'Luna のページは通常コントローラーで操作できます。できない場合はオンに：十字キーで移動、A で選択、B で戻る'
+    dnavHelp: 'Luna のページは通常コントローラーで操作できます。できない場合はオンに：十字キーで移動、A で選択、B で戻る',
+    upHelp: "4K テレビ向けに、ゲームを画面のフル解像度で表示してシャープにします (Luna からの映像は最大 1080p)。GPU の負荷が増えます"
   },
   ko: {
     secAcct: '계정',
@@ -301,11 +318,12 @@ module.exports = {
     glAll: '모든 Luna 게임',
     glHelpAll: 'Luna의 모든 게임이 이미지와 설명과 함께 EmulationStation의 Luna 목록에 표시되며, 선택하면 열립니다',
     ptS1: 'Luna에서 게임 페이지를 엽니다(타일 선택)',
-    lowHelp: '느린 기기용: 선명도, 선명함 강화, 스트림 통계 끔',
+    lowHelp: "느린 기기용: 선명도, 선명함 강화, 스트림 통계, 4K 업스케일, 영상 정리 끔",
     lpQ: '작은 ARM 기기로 보입니다. 저전력 설정을 켤까요? 선명도, 선명함 강화, 스트림 통계를 끕니다. 설정에서 언제든 바꿀 수 있습니다.',
     c4b: '다른 페이지(로그인, Prime 가입)에서는 {view} · 키보드: Home',
     c8b: '컨트롤러는 게임과 Luna 자체에서 모두 작동합니다',
     dnavT: '앱으로 Luna 이동',
-    dnavHelp: 'Luna 페이지는 보통 컨트롤러로 조작됩니다. 안 되면 켜세요: 방향 패드로 이동, A로 선택, B로 뒤로'
+    dnavHelp: 'Luna 페이지는 보통 컨트롤러로 조작됩니다. 안 되면 켜세요: 방향 패드로 이동, A로 선택, B로 뒤로',
+    upHelp: "4K TV용으로 게임을 화면의 최대 해상도로 표시하고 선명하게 합니다 (Luna 영상은 최대 1080p). GPU를 더 많이 사용합니다"
   }
 };

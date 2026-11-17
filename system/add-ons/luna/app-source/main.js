@@ -250,7 +250,7 @@ const LUNA_FIXED = {
   stream_as_windows: true, stream_resolution: 'auto', region_unlock: 'off', no_social: false, no_analytics: false,
   prefer_ipv6: false, wait_time: false, mic_on_launch: false, touch_controller: false, skip_splash: false, no_feedback: false,
   reduce_anim: false, stream_steady: false, keep_alive: false, auto_reconnect: false, split_players: 0, split_remember: false,
-  upscale_4k: false, video_cleanup: false, replay: false, picture_per_game: false, audio_boost: 100, vibration: 100
+  replay: false, picture_per_game: false, audio_boost: 100, vibration: 100
 };
 
 // Batocera's language (system.language in batocera.conf, e.g. de_DE), as one
@@ -1090,7 +1090,7 @@ function settingsHtml() {
   // Xbox Cloud Gaming's options that Luna doesn't have (or that aren't ready
   // for Luna yet): never shown
   var NOT_ON_LUNA = ['row-user', 'row-unlock', 'row-boost', 'row-res', 'row-net', 'row-windows', 'row-ipv6', 'row-mic', 'row-steady', 'row-recon', 'row-alive', 'row-replay',
-    'row-up', 'row-ut', 'row-us', 'row-clean', 'row-pg', 'row-vib', 'row-touch', 'row-split', 'row-rem',
+    'row-pg', 'row-vib', 'row-touch', 'row-split', 'row-rem',
     'row-social', 'row-wait', 'row-splash', 'row-fb', 'row-anim', 'row-ana', 'row-g3d'];
   NOT_ON_LUNA.forEach(function (id) { var e = document.getElementById(id); if (e) e.style.display = 'none'; });
   Array.prototype.forEach.call(document.querySelectorAll('.sec[data-k="secDash"]'), function (e) { e.style.display = 'none'; });
@@ -1099,12 +1099,12 @@ function settingsHtml() {
     rows = ['row-signout', 'row-soe']
       .concat(['row-region', 'row-language', 'row-volume', 'row-highlight', 'row-intro', 'row-isound', 'row-low'])
       .concat(['row-gpu', 'row-stats'])
-      .concat(['row-sharpen', 'row-clarity', 'row-ct', 'row-sa', 'row-br'])
+      .concat(['row-sharpen'].concat(S.x64 ? ['row-up'].concat(S.up ? ['row-ut', 'row-us'] : []) : []).concat(['row-clean', 'row-clarity', 'row-ct', 'row-sa', 'row-br']))
       .concat(['row-controls', 'row-dnav', 'row-batt'])
       .concat(['row-glist'].concat(S.game && GL[gi] === 'picked' ? ['row-gpick'] : []))
       .concat(S.reload ? ['row-reload'] : []).concat(['row-cache', 'row-logs', 'row-backup', 'row-restore', 'row-update', 'buttons']);
     LAST = rows.length - 1;
-    ['row-gpick'].forEach(function (id) { document.getElementById(id).style.display = rows.indexOf(id) >= 0 ? 'flex' : 'none'; });
+    ['row-gpick', 'row-ut', 'row-us'].forEach(function (id) { document.getElementById(id).style.display = rows.indexOf(id) >= 0 ? 'flex' : 'none'; });
   }
   var copen = false;   // the Controls list is showing
   var row = 0, btn = 0, sent = false, confirmUntil = 0, confirmTimer = null;
@@ -1310,7 +1310,7 @@ function settingsHtml() {
     secAcct: function () { S.soe = false; },
     secGen: function () { S.volume = 100; S.vmute = false; S.highlight = true; ii = 0; S.ivol = 100; S.imute = false; },
     secStream: function () { S.gpu = false; S.stats = false; },
-    secPic: function () { shi = 0; S.clarity = false; S.pic = { ct: 100, sa: 100, br: 100 }; },
+    secPic: function () { shi = 0; S.up = false; S.ut = 'screen'; S.us = 60; S.clean = false; S.clarity = false; S.pic = { ct: 100, sa: 100, br: 100 }; },
     secPad: function () { S.dnav = false; },
     secDash: function () { }
   };
@@ -1329,7 +1329,7 @@ function settingsHtml() {
   }
   // Low-power settings: the lighter choices for slower devices (Save keeps them)
   function lowPower() {
-    shi = 0; S.clarity = false; S.stats = false;
+    shi = 0; S.clarity = false; S.stats = false; S.up = false; S.clean = false;
     S.lowDone = true; buildRows(); row = rows.indexOf('row-low'); render();
   }
   // Back up: the settings, profiles (no sign-ins) and picked games in one file in the share folder
@@ -2894,7 +2894,7 @@ ipcMain.on('luna-safe', () => {
 const LOWPOWER_ASKED = path.join(HOME, 'lowpower-asked');
 const WHATSNEW_DUE = path.join(HOME, 'whats-new-due');
 function applyLowPower() {
-  cfg.reduce_anim = true; cfg.no_analytics = true; cfg.no_social = true;
+  cfg.stream_stats = false;
   cfg.upscale_4k = false; cfg.video_cleanup = false; cfg.video_sharpen = 'off'; cfg.clarity_boost = false; cfg.replay = false;
   saveCurrent();
   log('low-power settings turned on');

@@ -22,8 +22,10 @@ What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 **Stream and picture** (Settings)
 - **Picture**: sharpening, Clarity boost, and sliders for contrast, colour saturation and brightness.
+- **4K upscaling** on 64-bit PCs: Luna sends at most 1080p; the upscaler draws the game at your screen's full resolution and sharpens it on the graphics chip. Choose its size (screen, 1080p, 1440p or 4K) and sharpness.
+- **Video clean-up**: softens the blocks compression leaves in flat areas, keeping edges sharp.
 - **Stream stats**: resolution, frame rate, ping, bitrate, packet loss and decode time, shown at the top while you play.
-- **Quick settings in a game** (hold LB + RB + View, or F9): volume and picture over the game, stream stats and **screenshots** (saved to `/userdata/screenshots`).
+- **Quick settings in a game** (hold LB + RB + View, or F9): volume, picture, upscaling and clean-up over the game, stream stats and **screenshots** (saved to `/userdata/screenshots`).
 - **GPU acceleration** (including hardware video decoding), for devices that need it.
 
 **EmulationStation game list** (optional)
@@ -99,7 +101,7 @@ Luna's own pages follow the controller by themselves. If they don't on your setu
 | Account | Sign out of Amazon, sign out when closing |
 | General | Region (which country's Luna site), language, volume, key highlights, intro video and its sound, low-power settings |
 | Stream | GPU acceleration, stream stats |
-| Picture | Sharpening, Clarity boost, contrast, colour saturation, brightness |
+| Picture | Sharpening, 4K upscaling with its size and sharpness (64-bit PCs), video clean-up, Clarity boost, contrast, colour saturation, brightness |
 | Controller | The full list of controls, move around Luna with the app, controller battery |
 | EmulationStation | The game list (Off / All Luna games / Games I pick) |
 | Help and maintenance | Reload dashboard, clear cache, save logs for help, back up settings, restore settings, updates |
@@ -145,10 +147,10 @@ No. BUA's add-on installs Google Chrome and opens Luna in it. This one is its ow
 Prime includes a rotating set of Luna games; Luna Premium adds more. Games that aren't in your plan show their plan's sign-up on their Luna page.
 
 **Why aren't the resolution picker, region unlock or split screen here, like in the Xbox app?**
-Those worked by changing how Xbox's own site talks to its servers. Luna's site works differently, so they don't carry over.
+Those worked by changing how Xbox's own site talks to its servers (4K upscaling and video clean-up work on the picture itself, so they're here). Luna's site works differently, so they don't carry over.
 
 **The picture is black, flickers or breaks up.**
-Hold **LB + RB** for two seconds while the app opens (safe mode). It turns off GPU acceleration, sharpening and the picture adjustments. Then turn things back on one at a time.
+Hold **LB + RB** for two seconds while the app opens (safe mode). It turns off GPU acceleration, 4K upscaling, video clean-up, sharpening and the picture adjustments. Then turn things back on one at a time.
 
 **Picking a game in EmulationStation opens its page but doesn't start it.**
 The app presses the page's Play button for you. If the game isn't in your plan, or Luna words the button differently, it leaves the page as it is: press Play yourself. `luna-app.log` says what it found.
