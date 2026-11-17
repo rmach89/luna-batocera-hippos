@@ -17,6 +17,7 @@
   "return_to_carousel_delay": 0.3,
   "controller_fix": true,
   "dashboard_nav": false,
+  "amazon_passkeys": false,
   "game_list": "off",
   "sign_out_on_exit": false,
   "electron_version": ""

@@ -1,6 +1,6 @@
 AMAZON LUNA for Batocera & HippOS
 =================================
-Version 1.0.1 (November 2026)
+Version 1.0.2 (November 2026)
 Home page and new versions: https://github.com/rmach89/luna-batocera-hippos
 
 An unofficial, fan-made app, used at your own risk. It is not made,
@@ -86,6 +86,12 @@ Signing in: the first time, Luna asks you to sign in with your Amazon
 account. The sign-in box is selected for you and the on-screen keyboard
 comes up by itself: D-pad moves, A types, X deletes, Y capitals, B hides
 the keyboard, Menu is Done. You only sign in once.
+
+Passkeys: the app's browser engine can't finish a passkey sign-in on
+Linux, so the app has Amazon show its password page instead. Sign in with
+your password and Amazon's one-time code (by text or authenticator app).
+Your passkeys stay on your account for your other devices. To let Amazon
+offer passkeys anyway, set "amazon_passkeys": true in config.json.
 
 On Luna itself, the controller works the way Luna makes it work. If
 Luna's pages don't react to the controller on your setup, turn on

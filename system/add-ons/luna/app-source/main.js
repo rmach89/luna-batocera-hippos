@@ -91,6 +91,7 @@ const DEFAULTS = {
   controller_fix: true,      // put controllers the browser doesn't know (Steam Deck...) in the Xbox layout
   game_list: 'off',          // EmulationStation's Luna list: 'off' (just the app), 'all' Luna games or 'picked' ones
   dashboard_nav: false,      // the app moves around Luna's own pages with the D-pad (for when Luna doesn't react to the controller)
+  amazon_passkeys: false,    // let Amazon's sign-in offer passkeys (the app's browser engine can't finish them on Linux, so off)
   game_list_3d: false,       // the games' pictures in that list: 3D cases instead of the flat box art
   sign_out_on_exit: false,   // sign out of Amazon every time the app closes
   gpu_acceleration: false
@@ -236,6 +237,7 @@ function loadConfig(profileId) {
   cfg.muted = cfg.muted === true;
   cfg.sign_out_on_exit = cfg.sign_out_on_exit === true;
   cfg.dashboard_nav = cfg.dashboard_nav === true;
+  cfg.amazon_passkeys = cfg.amazon_passkeys === true;
   if (!['off', 'all', 'picked'].includes(cfg.game_list)) cfg.game_list = 'off';
   cfg.game_list_3d = false;
   // Xbox Cloud Gaming's own tricks, which Luna doesn't have: always off here
@@ -4286,7 +4288,11 @@ function makeMainWin() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true
+      sandbox: true,
+      // keep reading the controller (and running the stream at full speed)
+      // when an app screen or the on-screen keyboard has the focus: Luna
+      // should get the controller exactly as it does in Chrome
+      backgroundThrottling: false
     }, part ? { partition: part } : {})
   });
   guard(win.webContents);
@@ -4392,7 +4398,7 @@ function preloadText() {
 // the volume the Luna page plays at: 0 when muted in Settings
 function appVolume() { return cfg.muted ? 0 : cfg.volume; }
 ipcMain.on('luna-config', event => {
-  event.returnValue = Object.assign(padsFor(event.sender), { dashNav: cfg.dashboard_nav, replay: cfg.replay, touch: cfg.touch_controller, exitHoldMs: Math.round(cfg.exit_hold_seconds * 1000), keyHighlight: cfg.keyboard_highlight, padFix: cfg.controller_fix !== false, volume: appVolume(), i18n: preloadText(),
+  event.returnValue = Object.assign(padsFor(event.sender), { dashNav: cfg.dashboard_nav, passkeys: cfg.amazon_passkeys, replay: cfg.replay, touch: cfg.touch_controller, exitHoldMs: Math.round(cfg.exit_hold_seconds * 1000), keyHighlight: cfg.keyboard_highlight, padFix: cfg.controller_fix !== false, volume: appVolume(), i18n: preloadText(),
     stream: (() => { try { return onXboxPlay(event.sender.getURL()) ? streamScript() : ''; } catch (e) { return ''; } })() });
 });
 // the controller's Menu button on the welcome screen

@@ -85,6 +85,8 @@ The installer also works from BUA (Batocera Unofficial Add-ons): its questions a
 2. Press A. Luna opens. Sign in with your Amazon account: the on-screen keyboard comes up by itself on the sign-in boxes (A types, X deletes, Y capitals, Menu is Done).
 3. You stay signed in. Next time, Luna opens straight to your games.
 
+**Passkeys:** if your Amazon account uses a passkey, the app has Amazon show its password page instead (the app's browser engine can't finish a passkey sign-in on Linux). Sign in with your password and Amazon's one-time code; your passkeys stay on your account.
+
 Luna's own pages follow the controller by themselves. If they don't on your setup, turn on Settings → Controller → **Move around Luna with the app**: the D-pad then moves between the page's buttons, A selects and B goes back.
 
 ## Updating
@@ -163,6 +165,9 @@ Those worked by changing how Xbox's own site talks to its servers (4K upscaling 
 
 **The picture is black, flickers or breaks up.**
 Hold **LB + RB** for two seconds while the app opens (safe mode). It turns off GPU acceleration, 4K upscaling, video clean-up, sharpening and the picture adjustments. Then turn things back on one at a time.
+
+**Amazon asks for a passkey or shows a QR code to scan.**
+The app hides passkeys on Amazon's sign-in pages, so this shouldn't happen. If it does, choose "Sign in with your password" (or "Other ways to sign in") on that page. If you changed `amazon_passkeys` to `true` in config.json, set it back to `false`.
 
 **Picking a game in EmulationStation opens its page but doesn't start it.**
 The app presses the page's Play button for you. If the game isn't in your plan, or Luna words the button differently, it leaves the page as it is: press Play yourself. `luna-app.log` says what it found.

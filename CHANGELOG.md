@@ -2,6 +2,11 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Download them from [Releases](https://github.com/rmach89/luna-batocera-hippos/releases).
 
+## 1.0.2
+
+- **Signing in with a passkey account works.** The app's browser engine can't finish a passkey sign-in on Linux, so Amazon could leave you on a "use your passkey" or "scan this QR code" page with no way forward. The app now hides passkeys from Amazon's sign-in pages, so Amazon offers its password page (and its one-time code) instead. Your passkeys stay on your account for your other devices. To let Amazon offer them anyway: `"amazon_passkeys": true` in config.json.
+- **The controller keeps working when the Luna window isn't focused** (for example just after an app screen or the on-screen keyboard closes): Luna keeps getting the controller, and the stream keeps running at full speed, as in Chrome.
+
 ## 1.0.1
 
 - 4K upscaling is back (64-bit PCs): Luna sends at most 1080p, and the upscaler draws the game at your TV's full resolution and sharpens it on the graphics chip. Its size and sharpness are in Settings > Picture and in quick settings.

@@ -57,7 +57,8 @@ let REPLAY_ON = false;   // instant replay (Settings > Stream)
 let PADS = {};
 ipcRenderer.on('luna-pads', (e, p) => { PADS = { index: p && p.padIndex, exclude: p && p.padExclude }; });
 let STREAM_JS = '';
-let DASH_NAV = false;   // the app's own D-pad navigation on Luna's pages (Settings > Controller)   // the stream options (resolution, sharpening, stats, vibration), from the app
+let DASH_NAV = false;   // the app's own D-pad navigation on Luna's pages (Settings > Controller)
+let PASSKEYS = false;   // let Amazon's sign-in offer passkeys (config.json amazon_passkeys)   // the stream options (resolution, sharpening, stats, vibration), from the app
 const fill = (s, v) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m));
 try {
   const c = ipcRenderer.sendSync('luna-config') || {};
@@ -71,6 +72,7 @@ try {
   PADS = { index: c.padIndex, exclude: c.padExclude };
   REPLAY_ON = c.replay === true;
   DASH_NAV = c.dashNav === true;
+  PASSKEYS = c.passkeys === true;
 } catch (e) { /* use defaults */ }
 ipcRenderer.on('luna-dashnav', (e, on) => { DASH_NAV = !!on; });
 
@@ -107,6 +109,19 @@ const NO_PAD_JS = "(function(){\n  if (window.__lunaNoPad) return;\n  window.__l
 if (ON_WEB_PAGE) { try { webFrame.executeJavaScript(NO_PAD_JS); } catch (e) { /* the app adds it on load */ } }
 const PAD_EVENTS_JS = "(function(){\n  if (window.__lunaPadEvents) return;\n  window.__lunaPadEvents = 1;\n  // \"controller connected\" messages carry the controller too: the page gets\n  // it the way getGamepads shows it (a Steam controller as an Xbox one).\n  var GP = { gamepadconnected: 1, gamepaddisconnected: 1 };\n  function show(p) { try { return window.__lunaShowPad ? window.__lunaShowPad(p) : p; } catch (e) { return p; } }\n  function wrapEvent(e) {\n    // (a stand-in target: the real event's own fields can't be changed through a Proxy of it)\n    return new Proxy(Object.create(Object.getPrototypeOf(e)), { get: function (_, k) {\n      if (k === 'gamepad') return show(e.gamepad);\n      var v = e[k]; return typeof v === 'function' ? v.bind(e) : v;\n    } });\n  }\n  var wrapped = new WeakMap();\n  function wrapperOf(fn, make) {\n    if (!fn || (typeof fn !== 'function' && typeof fn.handleEvent !== 'function')) return fn;\n    var w = wrapped.get(fn);\n    if (!w && make) {\n      w = function (e) { var x = wrapEvent(e); return typeof fn === 'function' ? fn.call(this, x) : fn.handleEvent(x); };\n      wrapped.set(fn, w);\n    }\n    return w || fn;\n  }\n  var add = EventTarget.prototype.addEventListener, rem = EventTarget.prototype.removeEventListener;\n  EventTarget.prototype.addEventListener = function (t, fn) {\n    if (GP[t] && this === window) { var a = Array.prototype.slice.call(arguments); a[1] = wrapperOf(fn, true); return add.apply(this, a); }\n    return add.apply(this, arguments);\n  };\n  EventTarget.prototype.removeEventListener = function (t, fn) {\n    if (GP[t] && this === window) { var a = Array.prototype.slice.call(arguments); a[1] = wrapperOf(fn, false); return rem.apply(this, a); }\n    return rem.apply(this, arguments);\n  };\n  ['ongamepadconnected', 'ongamepaddisconnected'].forEach(function (name) {\n    var h = null, t = name.slice(2);\n    function run(e) { if (h) h.call(window, wrapEvent(e)); }\n    try {\n      Object.defineProperty(window, name, { configurable: true,\n        get: function () { return h; },\n        set: function (f) { if (h) rem.call(window, t, run); h = typeof f === 'function' ? f : null; if (h) add.call(window, t, run); } });\n    } catch (e) { /* left as it is */ }\n  });\n})();";
 if (ON_DASH) { try { webFrame.executeJavaScript(PAD_EVENTS_JS); } catch (e) { /* the app adds it on load */ } }
+// Amazon's sign-in and account pages: no passkeys. The app's browser engine
+// can't finish a passkey sign-in on Linux (no system passkey prompt, and no
+// phone to scan Amazon's QR code with), and Amazon then leaves you on a page
+// you can't get past. With passkeys hidden, Amazon offers its password page
+// (and its one-time code by text or app) instead, as it does in browsers
+// without passkeys. Only on Amazon's own pages other than Luna; the passkeys
+// themselves are left as they are on the account. config.json
+// "amazon_passkeys": true turns this off.
+const NO_PASSKEY_JS = "(function(){\n  if (window.__lunaNoPasskey) return;\n  window.__lunaNoPasskey = 1;\n  var gone = function () { return Promise.reject(new DOMException('Passkeys are not available here', 'NotSupportedError')); };\n  try { Object.defineProperty(window, 'PublicKeyCredential', { value: undefined, configurable: true, writable: true }); } catch (e) {}\n  try {\n    var C = navigator.credentials;\n    if (C) {\n      var get = C.get && C.get.bind(C), create = C.create && C.create.bind(C);\n      Object.defineProperty(C, 'get', { configurable: true, writable: true, value: function (o) { return o && o.publicKey ? gone() : get ? get(o) : gone(); } });\n      Object.defineProperty(C, 'create', { configurable: true, writable: true, value: function (o) { return o && o.publicKey ? gone() : create ? create(o) : gone(); } });\n    }\n  } catch (e) {}\n})();";
+if (ON_XBOX && !ON_DASH && !PASSKEYS) {
+  try { webFrame.executeJavaScript(NO_PASSKEY_JS); } catch (e) { /* the page keeps its passkeys */ }
+  if (/\/ap\//.test(location.pathname)) appLog('Amazon sign-in page: passkeys hidden, so Amazon offers its password page');
+}
 // the stream options, before the page's own scripts make their first request
 if (STREAM_JS) { try { webFrame.executeJavaScript(STREAM_JS); } catch (e) { /* the app adds it on load */ } }
 
