@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<gameList>
+  <game>
+    <path>./Amazon Luna.luna</path>
+    <name> Amazon Luna</name>
+    <sortname> Amazon Luna</sortname>
+    <desc>Play Amazon Luna's cloud games on Batocera: no downloads, no console needed. Sign in with your Amazon account and play the games included with Prime, Luna Premium and Luna's other plans, with your controller. Needs an internet connection (10 Mbps or faster; 5 GHz Wi-Fi or wired is best) and a plan that includes Luna's cloud games, in a country where they're offered.
+
+Hold View + Menu for 2 seconds to exit. Hold Menu for 1 second while playing for the welcome screen and Settings.
+
+Unofficial app for Batocera; not made by or affiliated with Amazon.</desc>
+    <image>./images/luna.png</image>
+    <thumbnail>./images/luna.png</thumbnail>
+    <rating>1</rating>
+    <releasedate>20201020T000000</releasedate>
+    <developer>Amazon</developer>
+    <publisher>Amazon</publisher>
+    <genre>Cloud Gaming</genre>
+    <players>1-4</players>
+    <lang>en</lang>
+  </game>
+</gameList>

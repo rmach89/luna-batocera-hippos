@@ -1,0 +1,23 @@
+{
+  "_help": "Settings for the Amazon Luna app. Edit, save, and the next launch uses them. If this file has a mistake, the app falls back to its built-in settings and says so in /userdata/system/logs/luna-app.log. Sites in 'allowed' are added to the app's built-in list (Luna and Amazon's sign-in are always allowed). Region (start_url), language ('auto' = same as Batocera), volume (0-100), keyboard_highlight, play_intro (true, \"daily\" or false), intro_volume, intro_muted, game_list ('off', 'all' or 'picked') and dashboard_nav can also be changed on the app's Settings screen: press Menu (Start) on the welcome screen, or use F1 > Applications > Amazon Luna Settings.",
+  "start_url": "https://luna.amazon.com/",
+  "allowed": [],
+  "user_agent": "",
+  "exit_hold_seconds": 2,
+  "show_exit_tip": true,
+  "keyboard_highlight": true,
+  "volume": 100,
+  "muted": false,
+  "play_intro": true,
+  "intro_volume": 100,
+  "intro_muted": false,
+  "language": "auto",
+  "gpu_acceleration": false,
+  "return_to_carousel": true,
+  "return_to_carousel_delay": 0.3,
+  "controller_fix": true,
+  "dashboard_nav": false,
+  "game_list": "off",
+  "sign_out_on_exit": false,
+  "electron_version": ""
+}
