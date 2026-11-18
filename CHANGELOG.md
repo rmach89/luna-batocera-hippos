@@ -1,13 +1,17 @@
 # Changelog
 
-Every version of the Amazon Luna add-on for Batocera and HippOS. Download them from [Releases](https://github.com/rmach89/luna-batocera-hippos/releases).
+Every version of the Amazon Luna add-on for Batocera and HippOS. Each version is a git tag; install one with `LUNA_REF=<tag>` (see the README).
+
+## 1.0.5
+
+- **Pinned installs stay pinned.** Installed with `LUNA_REF=<tag>`, Settings → Updates follows that tag instead of main (saved in `update-ref`, like the Xbox Cloud Gaming app), and applying an update keeps the pin. Installing without `LUNA_REF` goes back to following main.
+- **Shares an Electron that's already on the device** (Batocera and HippOS): another add-on's, or an app BUA installed unpacked, found in `/userdata/system/add-ons`. Its files are hard-linked, so nothing is downloaded and no extra space is used. Engine updates use it too when it's at least as new; otherwise they download as before. The installer only mentions it when a copy is really there. `LUNA_NO_SHARED_ELECTRON=1` turns this off.
 
 ## 1.0.4
 
 - **HippOS: nothing goes into the system area any more.** No `sudo` copy of the carousel logo into HippOS's built-in theme (HippOS ships the luna art itself) and no `apt-get`; the start script earlier versions added is removed. If the browser engine lacks a library, the installer names the Debian packages to report instead.
-- **Fixed versions:** every version is a git tag (no zips, no releases); `LUNA_REF=v1.0.4` installs exactly that one, and the in-app updater then follows that tag instead of main (saved in `update-ref`, like the Xbox Cloud Gaming app).
+- **Fixed versions:** every version is a git tag; `LUNA_REF=<tag>` installs exactly that one.
 - **MIT license** added.
-- **Shares an Electron that's already on the device** (Batocera and HippOS): another add-on's, or an app BUA installed unpacked, found in `/userdata/system/add-ons`. Its files are hard-linked, so nothing is downloaded and no extra space is used. Engine updates use it too when it's at least as new; otherwise they download as before. The installer only mentions it when a copy is really there. `LUNA_NO_SHARED_ELECTRON=1` turns this off.
 
 ## 1.0.3
 

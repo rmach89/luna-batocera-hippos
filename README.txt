@@ -1,6 +1,6 @@
 AMAZON LUNA for Batocera & HippOS
 =================================
-Version 1.0.4 (November 2026)
+Version 1.0.5 (November 2026)
 Home page and new versions: https://github.com/rmach89/luna-batocera-hippos
 
 An unofficial, fan-made app, used at your own risk. It is not made,
@@ -74,7 +74,7 @@ same command again. Your sign-in, settings and picked games are kept.
 Options, set before "bash" (for example ... | LUNA_SINGLE_LAUNCH=yes bash):
   LUNA_SINGLE_LAUNCH=yes / no   answer the Launch Single Game question
   LUNA_BRANCH=name              install another branch of the repository
-  LUNA_REF=v1.0.4               install exactly that version (a git tag);
+  LUNA_REF=v1.0.5               install exactly that version (a git tag);
                                 Settings > Updates then follows that tag
 
 
