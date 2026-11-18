@@ -43,7 +43,9 @@ What you need
   or Luna Premium), in a country where they're offered: the US, Canada,
   the UK, Germany, Austria, France, Italy, Spain, the Netherlands, Poland,
   Belgium, Luxembourg, Portugal or Sweden.
-- About 400 MB free in /userdata (the browser engine, Electron).
+- About 400 MB free in /userdata (the browser engine, Electron). None if
+  Electron is already on the device (for example from the Xbox Cloud
+  Gaming app): that copy is shared.
 - A controller (Xbox, PlayStation or Luna), or a keyboard and mouse.
 
 

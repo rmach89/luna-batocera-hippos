@@ -12,7 +12,9 @@
 #   luna.png  luna1.png  luna-background.jpg (optional)
 #   es_systems_luna.cfg  gamelist.xml
 #   Launch-AmazonLuna.sh  Build-Runtime.py  config.json  app.asar
-# and downloads the Electron browser engine from GitHub (about 100 MB).
+# and sets up the Electron browser engine: a copy already on this device
+# (such as Xbox Cloud Gaming's) is shared, otherwise it's downloaded from
+# GitHub (about 100 MB).
 LOGDIR=/userdata/system/logs
 LOG=$LOGDIR/luna-install.log
 mkdir -p "$LOGDIR"

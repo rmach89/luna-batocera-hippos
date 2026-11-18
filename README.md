@@ -57,7 +57,7 @@ The welcome and Settings screens are the app's own; the F1 menu is a mock-up (Ba
 - **Batocera or HippOS** on a 64-bit PC or a Steam Deck, or a 64-bit ARM device (see [Compatibility](#compatibility)).
 - **An internet connection**: at least 10 Mbps. Wired or 5 GHz Wi-Fi is best.
 - **An Amazon account** with a plan that includes Luna's cloud games (Prime or Luna Premium), in a country where they're offered: the US, Canada, the UK, Germany, Austria, France, Italy, Spain, the Netherlands, Poland, Belgium, Luxembourg, Portugal and Sweden.
-- **About 400 MB free** in `/userdata`, for the browser engine the installer downloads.
+- **About 400 MB free** in `/userdata`, for the browser engine the installer downloads. None if Electron is already on the device, for example from the [Xbox Cloud Gaming app](https://github.com/rmach89/xcloud-batocera-hippos): that copy is shared.
 - **A controller** (Xbox, PlayStation or Luna), or a keyboard and mouse.
 
 ## Install

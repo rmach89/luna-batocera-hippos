@@ -239,9 +239,9 @@ SINGLE_EOF
 fi
 case "$SINGLE" in no|n|N|NO|0|false) SINGLE=no ;; *) SINGLE=yes ;; esac
 if [ "$SINGLE" = yes ]; then
-    say "Installing Amazon Luna and Launch Single Game (downloads about 100 MB the first time)..."
+    say "Installing Amazon Luna and Launch Single Game (downloads about 100 MB the first time, unless Electron is already on this device)..."
 else
-    say "Installing Amazon Luna without Launch Single Game (downloads about 100 MB the first time)..."
+    say "Installing Amazon Luna without Launch Single Game (downloads about 100 MB the first time, unless Electron is already on this device)..."
 fi
 LUNA_SINGLE_LAUNCH="$SINGLE" bash "$FILES/Install-AmazonLuna.sh"
 cat "$LOGDIR/luna-install.log" 2>/dev/null
