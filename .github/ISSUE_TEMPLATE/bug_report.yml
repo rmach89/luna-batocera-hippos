@@ -64,10 +64,9 @@ body:
     attributes:
       label: How it was installed
       options:
+        - The install command (curl ... install.sh | bash)
         - BUA
-        - HippOS content downloader
-        - The zip from Releases
-        - install.sh on its own
+        - An older zip from Releases
   - type: textarea
     id: logs
     attributes:

@@ -1,6 +1,6 @@
 AMAZON LUNA for Batocera & HippOS
 =================================
-Version 1.0.3 (November 2026)
+Version 1.0.4 (November 2026)
 Home page and new versions: https://github.com/rmach89/luna-batocera-hippos
 
 An unofficial, fan-made app, used at your own risk. It is not made,
@@ -62,9 +62,9 @@ newest version straight from the GitHub repository (no zips or releases)
 and installs it in /userdata/system/add-ons/luna. On Batocera it asks
 whether to install Launch Single Game: with it, picking Amazon Luna in
 the carousel opens the app straight away, and closing the app takes you
-back to the carousel. On HippOS it asks nothing, and any system library
-the browser engine needs is installed from HippOS's package sources (kept
-across HippOS updates).
+back to the carousel. On HippOS it asks nothing and never writes to
+HippOS's system area (no sudo, no apt-get); HippOS's built-in themes get
+the luna carousel art from HippOS itself.
 
 To update later: Settings > Help and maintenance > Updates, or run the
 same command again. Your sign-in, settings and picked games are kept.
@@ -72,6 +72,7 @@ same command again. Your sign-in, settings and picked games are kept.
 Options, set before "bash" (for example ... | LUNA_SINGLE_LAUNCH=yes bash):
   LUNA_SINGLE_LAUNCH=yes / no   answer the Launch Single Game question
   LUNA_BRANCH=name              install another branch of the repository
+  LUNA_REF=v1.0.4               install exactly that version (a git tag)
 
 
 Using it

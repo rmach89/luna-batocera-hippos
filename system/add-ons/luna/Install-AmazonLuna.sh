@@ -47,7 +47,7 @@ fi
 
 # make sure the package files were copied over
 missing=""
-for f in luna.png luna-hippos.png luna-hippos-logo.sh luna-apply-update.sh luna-icon.png luna-uninstall-icon.png luna-settings-icon.png luna1.png es_systems_luna.cfg gamelist.xml Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json app.asar launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
+for f in luna.png luna-apply-update.sh luna-icon.png luna-uninstall-icon.png luna-settings-icon.png luna1.png es_systems_luna.cfg gamelist.xml Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json app.asar launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
     [ -s "$FILES/$f" ] || missing="$missing $f"
 done
 if [ -n "$missing" ]; then
@@ -59,10 +59,10 @@ fi
 mkdir -p "$ES" "$ROMS/images" || { echo "Install failed: could not create folders."; exit 1; }
 
 # strip any Windows line endings picked up while copying, then set permissions
-for f in es_systems_luna.cfg gamelist.xml luna-hippos-logo.sh luna-apply-update.sh Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
+for f in es_systems_luna.cfg gamelist.xml luna-apply-update.sh Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
     tr -d '\r' < "$FILES/$f" > "$FILES/$f.tmp" && mv "$FILES/$f.tmp" "$FILES/$f"
 done
-chmod +x "$FILES/luna-service.sh" "$FILES/luna-hippos-logo.sh" "$FILES/luna-apply-update.sh" "$FILES/Launch-AmazonLuna.sh" "$FILES/Run-App.sh" "$FILES/Return-To-Carousel.py" "$FILES/uninstall.sh" "$FILES/Uninstall-From-Menu.sh" "$FILES/Build-Runtime.py" "$FILES/Sync-GameList.py"
+chmod +x "$FILES/luna-service.sh" "$FILES/luna-apply-update.sh" "$FILES/Launch-AmazonLuna.sh" "$FILES/Run-App.sh" "$FILES/Return-To-Carousel.py" "$FILES/uninstall.sh" "$FILES/Uninstall-From-Menu.sh" "$FILES/Build-Runtime.py" "$FILES/Sync-GameList.py"
 
 # --- Launch Single Game (optional: install.sh asks; LUNA_SINGLE_LAUNCH=yes/no) ---
 # Two EmulationStation event scripts: when you pick a system that holds
@@ -208,7 +208,7 @@ THEME_DIRS=("$THEMES"/* /userdata/themes/*)
 if [ "$OS" = hippos ]; then
     # system themes are read-only for the HippOS user and replaced by updates
     THEME_DIRS=(/userdata/themes/*)
-    echo "HippOS: themes in /userdata/themes get the carousel art here; HippOS's built-in theme is handled below."
+    echo "HippOS: themes in /userdata/themes get the carousel art here; HippOS's built-in themes get theirs from HippOS."
 fi
 for theme in "${THEME_DIRS[@]}"; do
     [ -d "$theme" ] || continue
@@ -247,44 +247,16 @@ for theme in "${THEME_DIRS[@]}"; do
 done
 echo "Copied the carousel logo (and background, where the theme has them) into $count theme(s)."
 
-# --- HippOS: the logo in its built-in theme (es-theme-hippos-minimal) ---
-# Built-in themes are in HippOS's system area: only root can write there,
-# and every HippOS update replaces it. HippOS lets its user run sudo without
-# a password, so the logo goes in with "sudo -n" (never asks; skipped if it
-# isn't allowed), and an EmulationStation start script puts it back after
-# an update. The theme shows each system's art/<system>.svg, or .png when
-# there's no .svg, tinted with its colour: the logo is luna.png in white
-# (luna-hippos.png), so it comes out in the theme's colour.
-HIPPOS_LIST="$FILES/hippos-theme-files.txt"
-HIPPOS_START="$ES/scripts/start/luna-theme-logo.sh"
+# --- HippOS: its built-in themes ---
+# HippOS's own themes are in its system area, which this installer never
+# writes to (no sudo): HippOS ships the luna carousel art in them itself.
+# Until a HippOS version has it, the built-in theme shows "Amazon Luna" as
+# text. Earlier versions of this installer copied a logo there with sudo
+# and kept it there with a start script: that script is removed (copies
+# already made go away with the next HippOS update).
 if [ "$OS" = hippos ]; then
-    # the 1.1.24 test build's luna.svg would be shown instead of the PNG: take it out
-    if [ -s "$HIPPOS_LIST" ] && sudo -n true 2>/dev/null; then
-        while IFS=$'\t' read -r dest src; do
-            case "$dest" in *.svg) [ -e "$dest" ] && cmp -s "$src" "$dest" && sudo -n rm -f "$dest" 2>/dev/null && echo "Removed the earlier luna.svg from $(dirname "$dest")" ;; esac
-        done < "$HIPPOS_LIST"
-    fi
-    rm -f "$FILES/luna.svg"
-    : > "$HIPPOS_LIST"
-    if sudo -n true 2>/dev/null; then
-        placed=0
-        for theme in "$THEMES"/*; do
-            [ -d "$theme/art" ] || continue
-            [ -f "$theme/art/snes.svg" ] || [ -f "$theme/art/snes.png" ] || continue
-            src="$FILES/luna-hippos.png"; dest="$theme/art/luna.png"
-            # a theme that ships its own luna.svg keeps it (it'd be shown first anyway)
-            if [ -e "$theme/art/luna.svg" ]; then echo "$(basename "$theme") has its own Amazon Luna logo; left as it is."; continue; fi
-            # a theme that ships its own luna logo keeps it
-            if [ -e "$dest" ] && ! cmp -s "$src" "$dest"; then echo "$(basename "$theme") has its own Amazon Luna logo; left as it is."; continue; fi
-            printf '%s\t%s\n' "$dest" "$src" >> "$HIPPOS_LIST"
-            if sudo -n cp -f "$src" "$dest" 2>/dev/null; then placed=$((placed+1)); else echo "Could not place $dest"; fi
-        done
-        mkdir -p "$ES/scripts/start" && cp -f "$FILES/luna-hippos-logo.sh" "$HIPPOS_START" && chmod +x "$HIPPOS_START"
-        echo "HippOS: carousel logo placed in $placed built-in theme(s) (with sudo); it's put back after HippOS updates when EmulationStation starts."
-    else
-        rm -f "$HIPPOS_START"
-        echo "HippOS: sudo needs a password here, so the built-in theme shows \"Amazon Luna\" as text (the app works the same)."
-    fi
+    rm -f "$ES/scripts/start/luna-theme-logo.sh" "$FILES/hippos-theme-files.txt" "$FILES/luna-hippos-logo.sh" "$FILES/luna-hippos.png" "$FILES/luna.svg"
+    rmdir "$ES/scripts/start" 2>/dev/null
 fi
 
 # stop here if the important parts are missing, leaving the installer in place
@@ -387,12 +359,7 @@ if [ -f "$CUSTOM" ] && grep -q '# luna-boot-restore' "$CUSTOM"; then
 fi
 rm -f "$FILES/created-custom-sh" "$FILES/persist-mode"
 
-# HippOS: our logo in its built-in theme, and the start script that puts it back
-if [ -s "$FILES/hippos-theme-files.txt" ]; then
-    while IFS=$'\t' read -r dest src; do
-        [ -n "$dest" ] && [ -e "$dest" ] && cmp -s "$src" "$dest" && sudo -n rm -f "$dest" 2>/dev/null
-    done < "$FILES/hippos-theme-files.txt"
-fi
+# HippOS: the start script earlier versions used for the built-in theme logo
 rm -f "$ES/scripts/start/luna-theme-logo.sh" "$FILES/hippos-theme-files.txt"
 
 # nothing of this package in Ports (also clears entries from older versions)

@@ -76,7 +76,13 @@ That's all. The installer does the rest by itself:
 
 Then restart EmulationStation. Amazon Luna appears in the carousel.
 
-**On HippOS** it follows HippOS's own way of doing things: everything goes in `/userdata` (which HippOS updates never touch), the shortcuts go in the desktop's applications menu, the files belong to HippOS's user (also when you run the installer as root), and any system library the browser engine needs is installed from HippOS's package sources, the same way HippOS installs Chromium for its web apps, so it stays after HippOS updates. Nothing is asked.
+**On HippOS** it follows HippOS's own way of doing things: everything goes in `/userdata` (which HippOS updates never touch), the shortcuts go in the desktop's applications menu, the files belong to HippOS's user (also when you run the installer as root), and nothing is ever written to HippOS's system area: no `sudo`, no `apt-get`. HippOS's built-in themes get the luna carousel art from HippOS itself; until your HippOS version has it, the carousel shows "Amazon Luna" as text. Nothing is asked.
+
+**A fixed version:** each version is also a git tag. To install exactly that version, put `LUNA_REF=v1.0.4` before `bash`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/v1.0.4/install.sh | LUNA_REF=v1.0.4 bash
+```
 
 The installer also works from BUA (Batocera Unofficial Add-ons): its questions appear on BUA's screen.
 
@@ -187,3 +193,7 @@ The app presses the page's Play button for you. If the game isn't in your plan, 
 - The intro animation and sound are original, made for this project.
 - Japanese and Korean text uses parts of Noto Sans CJK (SIL Open Font License 1.1). The controller emoji is from Noto Color Emoji (Apache License 2.0).
 - Batocera, HippOS and EmulationStation are their own projects; this add-on only adds a system to them.
+
+## License
+
+[MIT](LICENSE). Amazon, Amazon Luna, Luna and Prime are trademarks of Amazon.com, Inc. or its affiliates; this project isn't affiliated with Amazon.

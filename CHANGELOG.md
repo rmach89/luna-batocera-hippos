@@ -2,11 +2,17 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Download them from [Releases](https://github.com/rmach89/luna-batocera-hippos/releases).
 
+## 1.0.4
+
+- **HippOS: nothing goes into the system area any more.** No `sudo` copy of the carousel logo into HippOS's built-in theme (HippOS ships the luna art itself) and no `apt-get`; the start script earlier versions added is removed. If the browser engine lacks a library, the installer names the Debian packages to report instead.
+- **Fixed versions:** every version is a git tag (no zips, no releases); `LUNA_REF=v1.0.4` installs exactly that one.
+- **MIT license** added.
+
 ## 1.0.3
 
 - **One-command install, straight from the repository.** `curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash` works out whether it's on Batocera or HippOS, downloads the newest version of the repository's main branch, installs it and cleans up. No zips and no releases any more; the old `/userdata/Amazon Luna` folder is removed if it's there.
 - **Updates come from the repository too:** Settings → Updates compares the app with the version on the main branch and downloads that.
-- **HippOS:** the installer refuses anything that isn't Batocera or HippOS; files made when it's run as root are handed to HippOS's user (1000:100), so EmulationStation and the app can use them; any system library the browser engine lacks is installed with apt from HippOS's package sources (HippOS keeps these across its updates).
+- **HippOS:** the installer refuses anything that isn't Batocera or HippOS; files made when it's run as root are handed to HippOS's user (1000:100), so EmulationStation and the app can use them.
 
 ## 1.0.2
 

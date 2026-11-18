@@ -48,7 +48,8 @@ BUA=
 ask_bua() {   # ask_bua <title> <text>: yes / no on BUA's screen (0 = yes)
     dialog --title "$1" --yesno "$2" 0 0
 }
-# the Debian package that holds a library Electron needs (for HippOS)
+# the Debian package that holds a library Electron needs (named in the
+# warning on HippOS; nothing is installed into the system)
 debian_package() {
     case "$1" in
         libnss3.so|libnssutil3.so|libsmime3.so) echo libnss3 ;;
@@ -107,13 +108,21 @@ fi
 # Only when this script sits in a full copy of the repository (a git clone)
 # does it install that copy instead (for testing changes).
 # LUNA_REPO / LUNA_BRANCH pick another repository or branch.
+# LUNA_REF=v1.0.4 installs that tagged version instead (a git tag, no zip):
+# for anyone who wants a fixed version, such as a HippOS catalog entry.
 REPO="${LUNA_REPO:-rmach89/luna-batocera-hippos}"
 BRANCH="${LUNA_BRANCH:-main}"
-TARBALL="${LUNA_TARBALL_URL:-https://codeload.github.com/$REPO/tar.gz/refs/heads/$BRANCH}"
+if [ -n "$LUNA_REF" ]; then
+    case "$LUNA_REF" in *[!A-Za-z0-9._-]*) fail "LUNA_REF must be a tag such as v1.0.4." ;; esac
+    TARBALL="${LUNA_TARBALL_URL:-https://codeload.github.com/$REPO/tar.gz/refs/tags/$LUNA_REF}"
+    BRANCH="tag $LUNA_REF"
+else
+    TARBALL="${LUNA_TARBALL_URL:-https://codeload.github.com/$REPO/tar.gz/refs/heads/$BRANCH}"
+fi
 if [ -n "$STANDALONE" ]; then
     command -v curl >/dev/null 2>&1 || fail "curl is needed to download Amazon Luna and wasn't found."
     command -v tar  >/dev/null 2>&1 || fail "tar is needed to unpack Amazon Luna and wasn't found."
-    say "Downloading the newest Amazon Luna from github.com/$REPO ($BRANCH)..."
+    if [ -n "$LUNA_REF" ]; then say "Downloading Amazon Luna $LUNA_REF from github.com/$REPO..."; else say "Downloading the newest Amazon Luna from github.com/$REPO ($BRANCH)..."; fi
     TMPD="$(mktemp -d "$USERDATA/.luna-download.XXXXXX" 2>/dev/null)" || fail "Couldn't make a folder in $USERDATA to download into."
     trap 'rm -rf "$TMPD"' EXIT
     if ! curl -fL -m 900 --retry 2 --progress-bar -o "$TMPD/luna.tar.gz" "$TARBALL"; then
@@ -247,24 +256,15 @@ if [ -x "$FILES/runtime/electron" ]; then
         libpath="$FILES/lib/$ARCH"
     fi
     missing="$(LD_LIBRARY_PATH="$libpath" ldd "$FILES/runtime/electron" 2>/dev/null | grep 'not found')"
-    # HippOS is Debian: a library it lacks is installed from its own
-    # package sources, the way HippOS installs Chromium for its web apps.
-    # HippOS keeps packages installed this way across its updates.
-    if [ -n "$missing" ] && [ "$OS" = hippos ] && command -v apt-get >/dev/null 2>&1; then
-        pkgs="$(printf '%s\n' "$missing" | awk '{print $1}' | while read -r lib; do debian_package "$lib"; done | sort -u | tr '\n' ' ')"
-        if [ -n "${pkgs// }" ]; then
-            say "Installing the system libraries the browser engine needs: $pkgs"
-            SUDO=; [ "$(id -u)" = 0 ] || SUDO="sudo -n"
-            $SUDO apt-get update -qq >/dev/null 2>&1
-            # shellcheck disable=SC2086
-            $SUDO apt-get install -y --no-install-recommends $pkgs >> "$LOGDIR/luna-install.log" 2>&1 \
-                || say "Couldn't install them (see $LOGDIR/luna-install.log)."
-            missing="$(LD_LIBRARY_PATH="$libpath" ldd "$FILES/runtime/electron" 2>/dev/null | grep 'not found')"
-        fi
-    fi
     if [ -n "$missing" ]; then
         say "Warning: this system is missing libraries the app needs:"
         echo "$missing"
+        # nothing is installed into the system: on HippOS, say which Debian
+        # packages hold them, so it can be reported to HippOS
+        if [ "$OS" = hippos ]; then
+            pkgs="$(printf '%s\n' "$missing" | awk '{print $1}' | while read -r lib; do debian_package "$lib"; done | sort -u | tr '\n' ' ')"
+            [ -n "${pkgs// }" ] && say "On HippOS these are in the Debian packages: $pkgs- please report this at https://github.com/$REPO/issues"
+        fi
     else
         say "The newest browser engine is installed."
     fi
