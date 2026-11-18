@@ -6,9 +6,9 @@ official GitHub releases, checks it against Electron's published SHA-256
 checksums, unpacks it into ./runtime and puts this project's app
 (app.asar) inside it. No BUA needed.
 
-If this device already has a copy of Electron in /userdata (for example the
-one the Xbox Cloud Gaming app downloaded), that copy is used instead of
-downloading another: its files are hard-linked into ./runtime, so they take
+If this device already has a copy of Electron in /userdata/system/add-ons
+(another add-on's, or an app BUA installed unpacked), that copy is used
+instead of downloading another: its files are hard-linked into ./runtime, so they take
 no extra space, and only this app's app.asar is added. That works the same
 on Batocera and HippOS. LUNA_NO_SHARED_ELECTRON=1 turns this off.
 
@@ -17,6 +17,8 @@ on Batocera and HippOS. LUNA_NO_SHARED_ELECTRON=1 turns this off.
   Build-Runtime.py --latest  used by the installer: get the newest Electron if
                              the one here is older (keeps it when offline)
   Build-Runtime.py --check   print the installed and newest versions (JSON)
+  Build-Runtime.py --find-shared  print "<version> <folder>" of an Electron
+                             already on this device (nothing if there's none)
   Build-Runtime.py --stage   download the newest version next to the one in
                              use; it takes over the next time the app opens
                              (used by Settings > Update engine)
@@ -180,59 +182,99 @@ def vtuple(v):
     return tuple(out + [0] * (3 - len(out)))
 
 
-def electron_dir_version(d):
-    """The Electron version in folder d if it's a plain Electron for this
-    processor (the electron program, its version file and resources), else None."""
-    exe = os.path.join(d, "electron")
+SKIP_EXES = {"chrome-sandbox", "chrome_crashpad_handler"}
+
+
+def _elf_ok(path):
     try:
-        if not (os.path.isfile(exe) and os.access(exe, os.X_OK)
-                and os.path.isdir(os.path.join(d, "resources"))
-                and os.path.isfile(os.path.join(d, "icudtl.dat"))):
-            return None
-        with open(os.path.join(d, "version"), encoding="utf-8") as f:
-            v = f.read().strip().lstrip("vV")
-        with open(exe, "rb") as f:
+        with open(path, "rb") as f:
             head = f.read(20)
-        want = ELF_MACHINE.get(arch())
-        if head[:4] != b"\x7fELF" or not want or head[4] != want[0] \
-                or int.from_bytes(head[18:20], "little") != want[1]:
-            return None
-        return "v" + v if v and v[0].isdigit() else None
+    except Exception:
+        return False
+    want = ELF_MACHINE.get(arch())
+    return (head[:4] == b"\x7fELF" and bool(want) and head[4] == want[0]
+            and int.from_bytes(head[18:20], "little") == want[1])
+
+
+def _version_in_binary(path):
+    """The Electron version written inside a program (packaged apps rename
+    the electron program and may not keep the version file)."""
+    import mmap, re
+    try:
+        with open(path, "rb") as f, mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
+            hit = re.search(rb"Electron/(\d{2,3}\.\d+\.\d+)", m)
+            return hit.group(1).decode() if hit else None
     except Exception:
         return None
 
 
+def electron_in(d):
+    """(program, version) if folder d holds an Electron for this processor:
+    the plain download (an electron program and its version file) or an
+    unpacked app built on it (BUA's apps, for example), else (None, None).
+    AppImages are packed and can't be shared, so they don't count."""
+    try:
+        if not (os.path.isfile(os.path.join(d, "icudtl.dat")) and os.path.isdir(os.path.join(d, "resources"))):
+            return None, None
+        exe = os.path.join(d, "electron")
+        if os.path.isfile(exe) and os.access(exe, os.X_OK) and _elf_ok(exe):
+            v = None
+            if os.path.isfile(os.path.join(d, "version")):
+                with open(os.path.join(d, "version"), encoding="utf-8") as f:
+                    v = f.read().strip().lstrip("vV")
+            v = v or _version_in_binary(exe)
+            return (exe, "v" + v) if v and v[0].isdigit() else (None, None)
+        for n in sorted(os.listdir(d)):
+            p = os.path.join(d, n)
+            if n in SKIP_EXES or "." in n or not os.path.isfile(p) or not os.access(p, os.X_OK):
+                continue
+            if os.path.getsize(p) < 50 * 1024 * 1024 or not _elf_ok(p):
+                continue
+            v = _version_in_binary(p)
+            if v:
+                return p, "v" + v
+    except Exception:
+        pass
+    return None, None
+
+
 def find_shared(at_least=None, exact=None):
-    """The newest usable Electron already on this device (outside this
-    app's own folders): (folder, version), or (None, None)."""
+    """The newest usable Electron already on this device, outside this app's
+    own folders: (folder, program, version), or (None, None, None).
+    Looks up to three folders deep in /userdata/system/add-ons, where both
+    Batocera and HippOS add-ons (BUA's included) keep their files."""
     if os.environ.get("LUNA_NO_SHARED_ELECTRON"):
-        return None, None
-    mine = {os.path.realpath(p) for p in (RUNTIME, NEXT)}
-    best = (None, None)
-    seen = set()
+        return None, None, None
+    mine = os.path.realpath(FILES)
+    best = (None, None, None)
     for root in SHARED_ROOTS:
+        root = os.path.realpath(root)
         if not os.path.isdir(root):
             continue
-        for addon in sorted(os.listdir(root)):
-            base = os.path.join(root, addon)
-            for d in (base, os.path.join(base, "runtime"), os.path.join(base, "electron")):
-                real = os.path.realpath(d)
-                if real in seen or real in mine or real.startswith(os.path.realpath(FILES) + os.sep):
-                    continue
-                seen.add(real)
-                v = electron_dir_version(d)
-                if not v or vtuple(v)[0] < MIN_ELECTRON:
-                    continue
-                if exact and vtuple(v) != vtuple(exact):
-                    continue
-                if at_least and vtuple(v) < vtuple(at_least):
-                    continue
-                if best[1] is None or vtuple(v) > vtuple(best[1]):
-                    best = (d, v)
+        for dirpath, dirnames, filenames in os.walk(root):
+            depth = os.path.relpath(dirpath, root).count(os.sep) + (dirpath != root)
+            real = os.path.realpath(dirpath)
+            if real == mine or real.startswith(mine + os.sep):
+                dirnames[:] = []
+                continue
+            if depth >= 3:
+                dirnames[:] = []
+            if "icudtl.dat" not in filenames:
+                continue
+            exe, v = electron_in(dirpath)
+            dirnames[:] = []
+            if not v or vtuple(v)[0] < MIN_ELECTRON:
+                continue
+            if exact and vtuple(v) != vtuple(exact):
+                continue
+            if at_least and vtuple(v) < vtuple(at_least):
+                continue
+            if best[2] is None or vtuple(v) > vtuple(best[2]):
+                best = (dirpath, exe, v)
     return best
 
 
-def link_electron(src):
+def link_electron(src, exe):
     """A runtime made from the Electron in src: every file hard-linked (no
     extra space), the other app's own app left out. Returns (tmpdir, out);
     raises if the files can't be linked (another drive, for instance)."""
@@ -253,6 +295,13 @@ def link_electron(src):
                 s_, d_ = os.path.join(dirpath, n), os.path.join(out, r)
                 if os.path.islink(s_):
                     os.symlink(os.readlink(s_), d_)
+                    continue
+                if os.path.abspath(s_) == os.path.abspath(exe):
+                    d_ = os.path.join(out, "electron")   # a packaged app's renamed program
+                elif rel == "." and n == "electron":
+                    continue
+                if os.path.islink(s_):
+                    os.symlink(os.readlink(s_), d_)
                 else:
                     os.link(s_, d_)
         if not os.path.isfile(os.path.join(out, "electron")):
@@ -267,10 +316,10 @@ def get_electron(version=None, at_least=None, exact=None):
     """An Electron runtime in a temporary folder: the copy already on this
     device when there is a suitable one, else downloaded. Returns
     (tmpdir, out, version, source)."""
-    src, v = find_shared(at_least=at_least, exact=exact)
+    src, exe, v = find_shared(at_least=at_least, exact=exact)
     if src:
         try:
-            tmpdir, out = link_electron(src)
+            tmpdir, out = link_electron(src, exe)
             say(f"Using the Electron {v} already on this device ({src}); nothing to download.")
             return tmpdir, out, v, src
         except Exception as e:
@@ -313,7 +362,7 @@ def stage():
         say(f"Missing {APP}.")
         return 1
     free_mb = shutil.disk_usage(FILES).free // (1024 * 1024)
-    if free_mb < NEED_MB and not find_shared()[0]:
+    if free_mb < NEED_MB and not find_shared()[2]:
         say(f"Not enough free space: about {NEED_MB} MB is needed and Batocera has {free_mb} MB.")
         return 1
     for leftover in os.listdir(FILES):
@@ -335,6 +384,11 @@ def stage():
 
 
 def main():
+    if "--find-shared" in sys.argv[1:]:
+        src, exe, v = find_shared()
+        if src:
+            print(f"{v} {src}", flush=True)
+        return 0
     if "--check" in sys.argv[1:]:
         return check()
     if "--stage" in sys.argv[1:]:
@@ -373,7 +427,7 @@ def main():
             shutil.rmtree(os.path.join(FILES, leftover), ignore_errors=True)
 
     free_mb = shutil.disk_usage(FILES).free // (1024 * 1024)
-    if free_mb < NEED_MB and not find_shared()[0]:
+    if free_mb < NEED_MB and not find_shared()[2]:
         say(f"Not enough free space: the browser engine needs about {NEED_MB} MB free, "
             f"and Batocera has {free_mb} MB. Make Batocera's storage bigger (see the README), then try again.")
         return 1

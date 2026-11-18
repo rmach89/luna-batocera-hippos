@@ -238,10 +238,19 @@ SINGLE_EOF
     fi
 fi
 case "$SINGLE" in no|n|N|NO|0|false) SINGLE=no ;; *) SINGLE=yes ;; esac
-if [ "$SINGLE" = yes ]; then
-    say "Installing Amazon Luna and Launch Single Game (downloads about 100 MB the first time, unless Electron is already on this device)..."
+# the browser engine: mentioned as shared only when a copy of Electron is
+# really on this device (another add-on's, or a BUA app's)
+ENGINE="downloads about 100 MB the first time"
+if [ ! -x "$FILES/runtime/electron" ]; then
+    shared="$(LUNA_HOME="$FILES" python3 -I "$FILES/Build-Runtime.py" --find-shared 2>/dev/null | head -n1)"
+    [ -n "$shared" ] && ENGINE="uses the Electron ${shared%% *} already in ${shared#* }, nothing to download"
 else
-    say "Installing Amazon Luna without Launch Single Game (downloads about 100 MB the first time, unless Electron is already on this device)..."
+    ENGINE="the browser engine is already installed"
+fi
+if [ "$SINGLE" = yes ]; then
+    say "Installing Amazon Luna and Launch Single Game ($ENGINE)..."
+else
+    say "Installing Amazon Luna without Launch Single Game ($ENGINE)..."
 fi
 LUNA_SINGLE_LAUNCH="$SINGLE" bash "$FILES/Install-AmazonLuna.sh"
 cat "$LOGDIR/luna-install.log" 2>/dev/null

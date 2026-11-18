@@ -7,7 +7,7 @@ Every version of the Amazon Luna add-on for Batocera and HippOS. Download them f
 - **HippOS: nothing goes into the system area any more.** No `sudo` copy of the carousel logo into HippOS's built-in theme (HippOS ships the luna art itself) and no `apt-get`; the start script earlier versions added is removed. If the browser engine lacks a library, the installer names the Debian packages to report instead.
 - **Fixed versions:** every version is a git tag (no zips, no releases); `LUNA_REF=v1.0.4` installs exactly that one.
 - **MIT license** added.
-- **Shares an Electron that's already on the device** (Batocera and HippOS), such as the Xbox Cloud Gaming app's: its files are hard-linked, so nothing is downloaded and no extra space is used. Engine updates use it too when it's at least as new; otherwise they download as before. `LUNA_NO_SHARED_ELECTRON=1` turns this off.
+- **Shares an Electron that's already on the device** (Batocera and HippOS): another add-on's, or an app BUA installed unpacked, found in `/userdata/system/add-ons`. Its files are hard-linked, so nothing is downloaded and no extra space is used. Engine updates use it too when it's at least as new; otherwise they download as before. The installer only mentions it when a copy is really there. `LUNA_NO_SHARED_ELECTRON=1` turns this off.
 
 ## 1.0.3
 
