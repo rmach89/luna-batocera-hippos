@@ -2,6 +2,10 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Each version is a git tag; install one with `LUNA_REF=<tag>` (see the README).
 
+## Unreleased
+
+- **HippOS: themes added later get the carousel art.** EmulationStation runs `luna-theme-art.sh` when it starts (from `/userdata/system/configs/emulationstation/scripts/start/`). It only touches `/userdata/themes`, never replaces a file a theme already has, and stops at once when no theme has changed since the last time. HippOS's built-in themes ship the luna art themselves. The uninstaller removes what it added.
+
 ## 1.0.5
 
 - **Pinned installs stay pinned.** Installed with `LUNA_REF=<tag>`, Settings → Updates follows that tag instead of main (saved in `update-ref`, like the Xbox Cloud Gaming app), and applying an update keeps the pin. Installing without `LUNA_REF` goes back to following main.

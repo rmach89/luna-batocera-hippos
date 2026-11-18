@@ -49,7 +49,7 @@ fi
 
 # make sure the package files were copied over
 missing=""
-for f in luna.png luna-apply-update.sh luna-icon.png luna-uninstall-icon.png luna-settings-icon.png luna1.png es_systems_luna.cfg gamelist.xml Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json app.asar launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
+for f in luna.png luna-apply-update.sh luna-theme-art.sh luna-icon.png luna-uninstall-icon.png luna-settings-icon.png luna1.png es_systems_luna.cfg gamelist.xml Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json app.asar launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
     [ -s "$FILES/$f" ] || missing="$missing $f"
 done
 if [ -n "$missing" ]; then
@@ -61,10 +61,10 @@ fi
 mkdir -p "$ES" "$ROMS/images" || { echo "Install failed: could not create folders."; exit 1; }
 
 # strip any Windows line endings picked up while copying, then set permissions
-for f in es_systems_luna.cfg gamelist.xml luna-apply-update.sh Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
+for f in es_systems_luna.cfg gamelist.xml luna-apply-update.sh luna-theme-art.sh Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
     tr -d '\r' < "$FILES/$f" > "$FILES/$f.tmp" && mv "$FILES/$f.tmp" "$FILES/$f"
 done
-chmod +x "$FILES/luna-service.sh" "$FILES/luna-apply-update.sh" "$FILES/Launch-AmazonLuna.sh" "$FILES/Run-App.sh" "$FILES/Return-To-Carousel.py" "$FILES/uninstall.sh" "$FILES/Uninstall-From-Menu.sh" "$FILES/Build-Runtime.py" "$FILES/Sync-GameList.py"
+chmod +x "$FILES/luna-service.sh" "$FILES/luna-apply-update.sh" "$FILES/luna-theme-art.sh" "$FILES/Launch-AmazonLuna.sh" "$FILES/Run-App.sh" "$FILES/Return-To-Carousel.py" "$FILES/uninstall.sh" "$FILES/Uninstall-From-Menu.sh" "$FILES/Build-Runtime.py" "$FILES/Sync-GameList.py"
 
 # --- Launch Single Game (optional: install.sh asks; LUNA_SINGLE_LAUNCH=yes/no) ---
 # Two EmulationStation event scripts: when you pick a system that holds
@@ -252,13 +252,27 @@ echo "Copied the carousel logo (and background, where the theme has them) into $
 # --- HippOS: its built-in themes ---
 # HippOS's own themes are in its system area, which this installer never
 # writes to (no sudo): HippOS ships the luna carousel art in them itself.
-# Until a HippOS version has it, the built-in theme shows "Amazon Luna" as
-# text. Earlier versions of this installer copied a logo there with sudo
-# and kept it there with a start script: that script is removed (copies
-# already made go away with the next HippOS update).
+# Earlier versions of this installer copied a logo there with sudo and kept
+# it there with a start script: that script is removed (copies already made
+# go away with the next HippOS update).
+# Themes added to /userdata/themes later get the art too: EmulationStation
+# runs luna-theme-art.sh when it starts. It only touches /userdata/themes,
+# never replaces a file a theme has, and stops at once when no theme has
+# changed since the last time.
 if [ "$OS" = hippos ]; then
-    rm -f "$ES/scripts/start/luna-theme-logo.sh" "$FILES/hippos-theme-files.txt" "$FILES/luna-hippos-logo.sh" "$FILES/luna-hippos.png" "$FILES/luna.svg"
-    rmdir "$ES/scripts/start" 2>/dev/null
+    rm -f "$ES/scripts/start/luna-theme-logo.sh" "$FILES/hippos-theme-files.txt" "$FILES/luna-hippos-logo.sh" "$FILES/luna-hippos.png" "$FILES/luna.svg" "$FILES/theme-art.stamp"
+    mkdir -p "$ES/scripts/start"
+    cat > "$ES/scripts/start/luna-theme-art.sh" << 'START_EOF'
+#!/bin/bash
+# Amazon Luna: carousel art for themes added to /userdata/themes later
+# (only adds missing files; does nothing when no theme has changed).
+s=/userdata/system/add-ons/luna/luna-theme-art.sh
+[ -x "$s" ] && "$s" >/dev/null 2>&1
+exit 0
+START_EOF
+    chmod +x "$ES/scripts/start/luna-theme-art.sh"
+    "$FILES/luna-theme-art.sh"
+    echo "HippOS: themes added to /userdata/themes later get the carousel art when EmulationStation starts."
 fi
 
 # stop here if the important parts are missing, leaving the installer in place
@@ -362,7 +376,7 @@ fi
 rm -f "$FILES/created-custom-sh" "$FILES/persist-mode"
 
 # HippOS: the start script earlier versions used for the built-in theme logo
-rm -f "$ES/scripts/start/luna-theme-logo.sh" "$FILES/hippos-theme-files.txt"
+rm -f "$ES/scripts/start/luna-theme-logo.sh" "$ES/scripts/start/luna-theme-art.sh" "$FILES/hippos-theme-files.txt" "$FILES/theme-art.stamp"
 
 # nothing of this package in Ports (also clears entries from older versions)
 rm -f "$PORTS/Install Amazon Luna.sh" "$PORTS/Uninstall Amazon Luna.sh"
