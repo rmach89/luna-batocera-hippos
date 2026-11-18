@@ -1,20 +1,18 @@
 #!/bin/bash
 # One-step installer for Amazon Luna on Batocera (and HippOS).
-# Run it from the extracted zip folder in a terminal (F1 > Applications >
-# xterm, or SSH):
-#     bash "/userdata/Amazon Luna/install.sh"
-# Or on its own, with nothing else next to it: it then downloads the newest
-# release from GitHub into /userdata/Amazon Luna and installs that:
-#     curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh -o /tmp/luna-install.sh
-#     bash /tmp/luna-install.sh
+# Run it in a terminal (F1 > Applications > xterm, or SSH). It works out
+# whether this is Batocera or HippOS, downloads the newest version straight
+# from the GitHub repository (no zips, no releases) and installs it:
+#     curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash
+# Running it again updates to the newest version; your settings and
+# sign-ins are kept.
 # It copies the files into place and installs everything: the luna
 # system, the Amazon Luna app (downloading the Electron browser
 # engine), Launch Single Game if you want it (it asks), and the shortcuts in
 # F1 > Applications.
 # Nothing goes in the Ports menu.
 # The package folder is the one this script is in. Piped in (curl ... | bash)
-# it isn't in any folder, so it downloads the package (standalone, below)
-# rather than taking whatever folder it happens to be run from.
+# it isn't in any folder, so it downloads the package (below).
 if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
     ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 else
@@ -28,10 +26,17 @@ say()  { echo "[Amazon Luna] $*"; }
 fail() { echo "[Amazon Luna] ERROR: $*" >&2; exit 1; }
 
 [ -d "$USERDATA/system" ] || fail "This must be run on Batocera or HippOS ($USERDATA/system not found)."
-OS=batocera
-[ -f "${LUNA_HIPPOS_VERSION:-/usr/share/hippos/version}" ] && OS=hippos
-# On HippOS the installer asks nothing (its content downloader can't answer):
-# Launch Single Game is left off and a newer release, if any, is installed.
+# Which system is this? HippOS has /usr/share/hippos/version, Batocera
+# /usr/share/batocera/batocera.version (LUNA_OS=batocera|hippos overrides).
+OS="${LUNA_OS:-}"
+if [ -z "$OS" ]; then
+    if [ -f "${LUNA_HIPPOS_VERSION:-/usr/share/hippos/version}" ]; then OS=hippos
+    elif [ -f /usr/share/batocera/batocera.version ] || command -v batocera-version >/dev/null 2>&1; then OS=batocera
+    else fail "This doesn't look like Batocera or HippOS, the only systems Amazon Luna installs on. Nothing was installed."
+    fi
+fi
+case "$OS" in batocera|hippos) ;; *) fail "LUNA_OS must be batocera or hippos." ;; esac
+# On HippOS the installer asks nothing: Launch Single Game is left off.
 ASK=1
 [ "$OS" = hippos ] && ASK=''
 can_ask() { [ -n "$ASK" ] && [ -t 0 ]; }
@@ -43,9 +48,39 @@ BUA=
 ask_bua() {   # ask_bua <title> <text>: yes / no on BUA's screen (0 = yes)
     dialog --title "$1" --yesno "$2" 0 0
 }
-# on its own (no package next to it): the package comes from GitHub, below
+# the Debian package that holds a library Electron needs (for HippOS)
+debian_package() {
+    case "$1" in
+        libnss3.so|libnssutil3.so|libsmime3.so) echo libnss3 ;;
+        libnspr4.so|libplc4.so|libplds4.so) echo libnspr4 ;;
+        libatk-1.0.so.0) echo libatk1.0-0t64 ;;
+        libatk-bridge-2.0.so.0) echo libatk-bridge2.0-0t64 ;;
+        libatspi.so.0) echo libatspi2.0-0t64 ;;
+        libcups.so.2) echo libcups2t64 ;;
+        libgtk-3.so.0|libgdk-3.so.0) echo libgtk-3-0t64 ;;
+        libpango-1.0.so.0) echo libpango-1.0-0 ;;
+        libcairo.so.2) echo libcairo2 ;;
+        libgio-2.0.so.0|libglib-2.0.so.0|libgobject-2.0.so.0|libgmodule-2.0.so.0) echo libglib2.0-0t64 ;;
+        libdbus-1.so.3) echo libdbus-1-3 ;;
+        libexpat.so.1) echo libexpat1 ;;
+        libxkbcommon.so.0) echo libxkbcommon0 ;;
+        libX11.so.6) echo libx11-6 ;;
+        libxcb.so.1) echo libxcb1 ;;
+        libXcomposite.so.1) echo libxcomposite1 ;;
+        libXdamage.so.1) echo libxdamage1 ;;
+        libXext.so.6) echo libxext6 ;;
+        libXfixes.so.3) echo libxfixes3 ;;
+        libXrandr.so.2) echo libxrandr2 ;;
+        libgbm.so.1) echo libgbm1 ;;
+        libdrm.so.2) echo libdrm2 ;;
+        libasound.so.2) echo libasound2t64 ;;
+        libudev.so.1) echo libudev1 ;;
+    esac
+}
+# not in a full copy of the repository: the files come from GitHub, below
 STANDALONE=
 [ -f "$ROOT/system/add-ons/luna/app.asar" ] || STANDALONE=1
+OS_NAME=Batocera; [ "$OS" = hippos ] && OS_NAME=HippOS
 command -v python3 >/dev/null 2>&1 || fail "Python 3 is needed and wasn't found."
 
 # Can this device run it? The browser engine (Electron) exists for 64-bit
@@ -59,119 +94,52 @@ case "$(uname -m)" in
     *)       fail "This device's processor ($(uname -m)) isn't supported: there is no browser engine for it. Nothing was installed." ;;
 esac
 mem_mb="$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo 2>/dev/null)"
-say "Device: $(uname -m), ${mem_mb:-?} MB memory."
-if [ -n "$mem_mb" ] && [ "$mem_mb" -lt 1800 ]; then
+[ -z "$LUNA_FROM_GITHUB" ] && say "Detected $OS_NAME on $(uname -m), ${mem_mb:-?} MB memory."
+if [ -z "$LUNA_FROM_GITHUB" ] && [ -n "$mem_mb" ] && [ "$mem_mb" -lt 1800 ]; then
     say "Warning: this device has less than 2 GB of memory. The app may be very slow or close by itself."
     say "It installs anyway; see Compatibility in README.txt."
 fi
 
-# --- on its own: download the newest release and install that ---
-# It's unpacked into /userdata/Amazon Luna, the same as unzipping it
-# yourself, and its installer runs from there (asking its questions in this
-# terminal, even when this script was piped into bash).
+# --- the files come straight from GitHub ---
+# No zips or releases: the installer gets the newest version of the
+# repository (its main branch) as one download, unpacks it in a temporary
+# folder in /userdata, installs from there and deletes the download.
+# Only when this script sits in a full copy of the repository (a git clone)
+# does it install that copy instead (for testing changes).
+# LUNA_REPO / LUNA_BRANCH pick another repository or branch.
 REPO="${LUNA_REPO:-rmach89/luna-batocera-hippos}"
+BRANCH="${LUNA_BRANCH:-main}"
+TARBALL="${LUNA_TARBALL_URL:-https://codeload.github.com/$REPO/tar.gz/refs/heads/$BRANCH}"
 if [ -n "$STANDALONE" ]; then
-    command -v curl >/dev/null 2>&1 || fail "Nothing to install next to this script, and curl isn't here to download it. Download the zip from https://github.com/$REPO/releases/latest instead."
-    say "No package next to this installer: getting the newest version from GitHub..."
-    rel_json="$(curl -fsSL -m 20 -H 'Accept: application/vnd.github+json' "${LUNA_RELEASE_API:-https://api.github.com/repos/$REPO/releases/latest}" 2>/dev/null)"
-    read -r REL_VER REL_ZIP < <(printf '%s' "$rel_json" | python3 -c '
-import json, sys
-try:
-    r = json.load(sys.stdin)
-except Exception:
-    sys.exit(0)
-tag = str(r.get("tag_name", "")).lstrip("vV")
-zips = [a.get("browser_download_url", "") for a in r.get("assets", []) if str(a.get("name", "")).lower().endswith(".zip")]
-if tag and zips:
-    print(tag, zips[0])
-' 2>/dev/null)
-    [ -n "$REL_ZIP" ] || fail "Couldn't get the newest release from GitHub (no internet, or no release with a zip yet). Nothing was installed."
-    say "Downloading v$REL_VER..."
+    command -v curl >/dev/null 2>&1 || fail "curl is needed to download Amazon Luna and wasn't found."
+    command -v tar  >/dev/null 2>&1 || fail "tar is needed to unpack Amazon Luna and wasn't found."
+    say "Downloading the newest Amazon Luna from github.com/$REPO ($BRANCH)..."
     TMPD="$(mktemp -d "$USERDATA/.luna-download.XXXXXX" 2>/dev/null)" || fail "Couldn't make a folder in $USERDATA to download into."
-    if ! curl -fL -m 900 --progress-bar -o "$TMPD/package.zip" "$REL_ZIP" \
-       || ! python3 -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])' "$TMPD/package.zip" "$TMPD/x" 2>/dev/null; then
-        rm -rf "$TMPD"; fail "Couldn't download or unpack v$REL_VER. Nothing was installed."
+    trap 'rm -rf "$TMPD"' EXIT
+    if ! curl -fL -m 900 --retry 2 --progress-bar -o "$TMPD/luna.tar.gz" "$TARBALL"; then
+        fail "Couldn't download Amazon Luna from GitHub (no internet, or GitHub isn't answering). Nothing was installed."
     fi
-    NEW_INSTALL="$(find "$TMPD/x" -maxdepth 3 -name install.sh -path '*/install.sh' | head -n1)"
-    PKG="$(dirname "$NEW_INSTALL" 2>/dev/null)"
-    if [ -z "$NEW_INSTALL" ] || [ ! -f "$PKG/system/add-ons/luna/app.asar" ]; then
-        rm -rf "$TMPD"; fail "The download didn't look like an Amazon Luna package. Nothing was installed."
-    fi
-    DEST="$USERDATA/Amazon Luna"
-    rm -rf "$DEST" && mv "$PKG" "$DEST" || { rm -rf "$TMPD"; fail "Couldn't put the package in $DEST."; }
-    rm -rf "$TMPD"
-    say "Unpacked v$REL_VER into $DEST. Running its installer..."
+    mkdir -p "$TMPD/x" && tar -xzf "$TMPD/luna.tar.gz" -C "$TMPD/x" 2>/dev/null \
+        || fail "The download couldn't be unpacked. Nothing was installed."
+    rm -f "$TMPD/luna.tar.gz"
+    PKG="$(dirname "$(find "$TMPD/x" -maxdepth 2 -name install.sh | head -n1)")"
+    [ -f "$PKG/install.sh" ] && [ -f "$PKG/system/add-ons/luna/app.asar" ] \
+        || fail "The download didn't look like Amazon Luna. Nothing was installed."
+    say "Got v$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$PKG/system/add-ons/luna/app-source/package.json" | head -n1). Installing..."
+    # questions go to this terminal even when the script was piped into bash
     if [ -n "$ASK" ] && [ -z "$BUA" ] && [ ! -t 0 ] && ( : < /dev/tty ) 2>/dev/null; then
-        LUNA_NO_UPDATE_CHECK=1 bash "$DEST/install.sh" < /dev/tty
+        LUNA_FROM_GITHUB=1 bash "$PKG/install.sh" < /dev/tty
     else
-        LUNA_NO_UPDATE_CHECK=1 bash "$DEST/install.sh"
+        LUNA_FROM_GITHUB=1 bash "$PKG/install.sh"
     fi
     exit $?
 fi
-
-# --- a newer version on GitHub? ---
-# The app's home: github.com/rmach89/luna-batocera-hippos. Each version
-# is a Release there with its zip. If a newer one than this package is out,
-# it's offered (downloaded, unpacked and its installer run instead). No
-# internet, or GitHub not answering: this package installs as usual.
-# LUNA_NO_UPDATE_CHECK=1 skips the check; LUNA_UPDATE=yes / no answers
-# the question ahead of time.
 THIS_VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$ROOT/system/add-ons/luna/app-source/package.json" 2>/dev/null | head -n1)"
-newer_than() {   # is $1 a later version than $2?
-    [ "$1" != "$2" ] && [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -n1)" = "$1" ]
-}
-if [ -z "$LUNA_NO_UPDATE_CHECK" ] && [ -n "$THIS_VERSION" ] && command -v curl >/dev/null 2>&1; then
-    say "This package: v$THIS_VERSION. Checking GitHub for a newer version..."
-    latest_json="$(curl -fsSL -m 15 -H 'Accept: application/vnd.github+json' "${LUNA_RELEASE_API:-https://api.github.com/repos/$REPO/releases/latest}" 2>/dev/null)"
-    read -r LATEST LATEST_ZIP < <(printf '%s' "$latest_json" | python3 -c '
-import json, sys
-try:
-    r = json.load(sys.stdin)
-except Exception:
-    sys.exit(0)
-tag = str(r.get("tag_name", "")).lstrip("vV")
-zips = [a.get("browser_download_url", "") for a in r.get("assets", []) if str(a.get("name", "")).lower().endswith(".zip")]
-if tag and zips:
-    print(tag, zips[0])
-' 2>/dev/null)
-    if [ -z "$LATEST" ]; then
-        say "Couldn't reach GitHub (or no release there yet): installing this package."
-    elif newer_than "$LATEST" "$THIS_VERSION"; then
-        say "A newer version is out: v$LATEST (this package is v$THIS_VERSION)."
-        GET="${LUNA_UPDATE:-}"
-        [ -z "$GET" ] && [ "$OS" = hippos ] && GET=yes   # nothing asked on HippOS: the newer one
-        if [ -z "$GET" ] && [ -n "$BUA" ] && [ -n "$ASK" ]; then
-            if ask_bua "Amazon Luna" "A newer version is out: v$LATEST (this package is v$THIS_VERSION). Download and install v$LATEST instead?"; then GET=yes; else GET=no; fi
-        fi
-        if [ -z "$GET" ]; then
-            if can_ask; then
-                read -r -p "Download and install v$LATEST instead? [Y/n] " a
-                case "$a" in n|N|no|NO) GET=no ;; *) GET=yes ;; esac
-            else
-                GET=no
-                say "(No one to ask here: installing this package. Run the installer in a terminal to get v$LATEST.)"
-            fi
-        fi
-        if [ "$GET" = yes ]; then
-            TMPD="$(mktemp -d "$USERDATA/.luna-update.XXXXXX" 2>/dev/null)"
-            if [ -n "$TMPD" ] && curl -fL -m 600 --progress-bar -o "$TMPD/update.zip" "$LATEST_ZIP" \
-               && python3 -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])' "$TMPD/update.zip" "$TMPD/x" 2>/dev/null; then
-                NEW_INSTALL="$(find "$TMPD/x" -maxdepth 3 -name install.sh -path '*/install.sh' | head -n1)"
-                if [ -n "$NEW_INSTALL" ] && [ -f "$(dirname "$NEW_INSTALL")/system/add-ons/luna/app.asar" ]; then
-                    say "Running the v$LATEST installer..."
-                    LUNA_NO_UPDATE_CHECK=1 bash "$NEW_INSTALL"; rc=$?
-                    rm -rf "$TMPD"
-                    exit $rc
-                fi
-                say "The download didn't look like an Amazon Luna package: installing this one instead."
-            else
-                say "Couldn't download v$LATEST: installing this package instead."
-            fi
-            [ -n "$TMPD" ] && rm -rf "$TMPD"
-        fi
-    else
-        say "This is the newest version."
-    fi
+[ -z "$LUNA_FROM_GITHUB" ] && say "Installing v${THIS_VERSION:-?} from the folder $ROOT (not downloading)."
+# the unzipped folder older versions used: no longer needed
+OLD_PKG="$USERDATA/Amazon Luna"
+if [ "$ROOT" != "$OLD_PKG" ] && [ -f "$OLD_PKG/install.sh" ] && [ -f "$OLD_PKG/system/add-ons/luna/app.asar" ]; then
+    rm -rf "$OLD_PKG" && say "Removed the old unzipped package folder $OLD_PKG (no longer needed)."
 fi
 
 if [ "$OS" = hippos ]; then
@@ -197,7 +165,7 @@ for f in "$ROOT/system/add-ons/luna/"*; do
     fi
     cp -rf "$f" "$FILES/" || fail "Could not copy $name."
 done
-# fix Windows line endings on the installer, in case the zip was unpacked on a PC
+# fix Windows line endings on the installer, in case the files were copied from a PC
 tr -d '\r' < "$FILES/Install-AmazonLuna.sh" > "$FILES/Install-AmazonLuna.sh.tmp" \
     && mv "$FILES/Install-AmazonLuna.sh.tmp" "$FILES/Install-AmazonLuna.sh"
 
@@ -213,7 +181,7 @@ if [ -z "$SINGLE" ]; then
     if [ "$OS" = hippos ]; then
         # nothing asked on HippOS: no Launch Single Game (LUNA_SINGLE_LAUNCH=yes adds it)
         SINGLE=no
-        say "HippOS: Launch Single Game is left off (LUNA_SINGLE_LAUNCH=yes bash install.sh adds it)."
+        say "HippOS: Launch Single Game is left off (run the install command with LUNA_SINGLE_LAUNCH=yes before bash to add it)."
     elif [ -n "$BUA" ]; then
         if ask_bua "Launch Single Game (optional)" "With it, picking Amazon Luna in the carousel opens the app straight away, and closing the app takes you back to the carousel. Without it, you see Amazon Luna's list first and press A on it. It only acts on Amazon Luna; your other systems behave as before. Amazon Luna works the same either way.
 
@@ -279,6 +247,21 @@ if [ -x "$FILES/runtime/electron" ]; then
         libpath="$FILES/lib/$ARCH"
     fi
     missing="$(LD_LIBRARY_PATH="$libpath" ldd "$FILES/runtime/electron" 2>/dev/null | grep 'not found')"
+    # HippOS is Debian: a library it lacks is installed from its own
+    # package sources, the way HippOS installs Chromium for its web apps.
+    # HippOS keeps packages installed this way across its updates.
+    if [ -n "$missing" ] && [ "$OS" = hippos ] && command -v apt-get >/dev/null 2>&1; then
+        pkgs="$(printf '%s\n' "$missing" | awk '{print $1}' | while read -r lib; do debian_package "$lib"; done | sort -u | tr '\n' ' ')"
+        if [ -n "${pkgs// }" ]; then
+            say "Installing the system libraries the browser engine needs: $pkgs"
+            SUDO=; [ "$(id -u)" = 0 ] || SUDO="sudo -n"
+            $SUDO apt-get update -qq >/dev/null 2>&1
+            # shellcheck disable=SC2086
+            $SUDO apt-get install -y --no-install-recommends $pkgs >> "$LOGDIR/luna-install.log" 2>&1 \
+                || say "Couldn't install them (see $LOGDIR/luna-install.log)."
+            missing="$(LD_LIBRARY_PATH="$libpath" ldd "$FILES/runtime/electron" 2>/dev/null | grep 'not found')"
+        fi
+    fi
     if [ -n "$missing" ]; then
         say "Warning: this system is missing libraries the app needs:"
         echo "$missing"
@@ -287,6 +270,19 @@ if [ -x "$FILES/runtime/electron" ]; then
     fi
 else
     say "The browser engine will download the first time you launch Amazon Luna."
+fi
+
+# HippOS runs EmulationStation and the app as its own user (1000:100), not
+# root: when this installer was run as root (sudo, or SSH as root), the
+# files it made are handed to that user, as HippOS does for its launchers.
+if [ "$OS" = hippos ] && [ "$(id -u)" = 0 ]; then
+    OWNER="${LUNA_OWNER:-1000:100}"
+    for p in "$FILES" "$USERDATA/roms/luna" "$USERDATA/system/configs/emulationstation" \
+             "$USERDATA/.local/share/applications" "$USERDATA/system/.local/share/applications" \
+             "$USERDATA/system/launchsingle.systems" "$LOGDIR"/luna-*.log; do
+        [ -e "$p" ] && chown -R "$OWNER" "$p" 2>/dev/null
+    done
+    say "Files handed to HippOS's user ($OWNER)."
 fi
 
 echo

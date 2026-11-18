@@ -1,6 +1,6 @@
 AMAZON LUNA for Batocera & HippOS
 =================================
-Version 1.0.2 (November 2026)
+Version 1.0.3 (November 2026)
 Home page and new versions: https://github.com/rmach89/luna-batocera-hippos
 
 An unofficial, fan-made app, used at your own risk. It is not made,
@@ -49,29 +49,29 @@ What you need
 
 Install and update
 ------------------
-1. Copy the "Amazon Luna" folder to the top of the share folder
-   (/userdata), so you have /userdata/Amazon Luna.
-2. Open a terminal (F1 > Applications > xterm, or SSH) and run:
-       bash "/userdata/Amazon Luna/install.sh"
-3. Answer its questions, then restart EmulationStation
-   (Main Menu > Quit > Restart EmulationStation).
+Open a terminal (F1 > Applications > xterm on Batocera, the desktop's
+terminal on HippOS, or SSH) and run:
 
-Or with just the installer: install.sh also works on its own. With
-nothing next to it, it downloads the newest release from GitHub, unpacks
-it into /userdata/Amazon Luna and installs it.
+    curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash
 
-Before installing, the installer checks GitHub for a newer version and
-offers it. It also asks whether to install Launch Single Game: with it,
-picking Amazon Luna in the carousel opens the app straight away, and
-closing the app takes you back to the carousel.
+Then restart EmulationStation (Main Menu > Quit > Restart EmulationStation).
+
+The installer does everything by itself: it works out whether this is
+Batocera or HippOS and which processor the device has, downloads the
+newest version straight from the GitHub repository (no zips or releases)
+and installs it in /userdata/system/add-ons/luna. On Batocera it asks
+whether to install Launch Single Game: with it, picking Amazon Luna in
+the carousel opens the app straight away, and closing the app takes you
+back to the carousel. On HippOS it asks nothing, and any system library
+the browser engine needs is installed from HippOS's package sources (kept
+across HippOS updates).
 
 To update later: Settings > Help and maintenance > Updates, or run the
-installer again. Your sign-in, settings and picked games are kept.
+same command again. Your sign-in, settings and picked games are kept.
 
-Options, set before the command (for example LUNA_UPDATE=no bash install.sh):
-  LUNA_NO_UPDATE_CHECK=1    don't check GitHub for a newer version
-  LUNA_UPDATE=yes / no      answer "install the newer version?" ahead of time
+Options, set before "bash" (for example ... | LUNA_SINGLE_LAUNCH=yes bash):
   LUNA_SINGLE_LAUNCH=yes / no   answer the Launch Single Game question
+  LUNA_BRANCH=name              install another branch of the repository
 
 
 Using it

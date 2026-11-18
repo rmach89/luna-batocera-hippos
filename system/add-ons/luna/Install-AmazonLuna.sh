@@ -6,9 +6,9 @@
 # F1 > Applications ("Amazon Luna", "Amazon Luna Settings" and "Amazon Luna
 # Uninstaller"). It puts nothing in the Ports menu (and clears entries older
 # versions left there). Run by install.sh:
-#     bash "/userdata/Amazon Luna/install.sh"
+#     curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash
 #
-# It uses the files in /userdata/system/add-ons/luna/ (from the zip):
+# It uses the files in /userdata/system/add-ons/luna/ (put there by install.sh):
 #   luna.png  luna1.png  luna-background.jpg (optional)
 #   es_systems_luna.cfg  gamelist.xml
 #   Launch-AmazonLuna.sh  Build-Runtime.py  config.json  app.asar
@@ -52,7 +52,7 @@ for f in luna.png luna-hippos.png luna-hippos-logo.sh luna-apply-update.sh luna-
 done
 if [ -n "$missing" ]; then
     echo "Install failed: missing from $FILES:$missing"
-    echo "Copy the zip's 'system' folder onto the Batocera share, then run this again."
+    echo "Run install.sh instead: curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash"
     exit 1
 fi
 

@@ -3476,12 +3476,13 @@ function checkPadBatteries() {
   }
 }
 
-// ---------- Updates: the app (GitHub Releases) and the browser engine ----------
+// ---------- Updates: the app (GitHub repository) and the browser engine ----------
 // One press of Settings > Updates checks both and gets whatever is newer, by
 // itself:
-//  - the app: the newest Release of the app's GitHub repository (only
-//    published Releases, never work in progress). Its zip is downloaded,
-//    unpacked and checked into update-staged/; the next time the app
+//  - the app: the newest version on the main branch of the app's GitHub
+//    repository (no zips or releases: the version in its package.json).
+//    The branch is downloaded as one archive, unpacked and checked into
+//    update-staged/; the next time the app
 //    closes, Launch-AmazonLuna.sh runs that version's installer in the
 //    background (luna-apply-update.sh), which keeps config.json, the
 //    profiles, sign-ins, PIN and picked games, and also brings the newest
@@ -3491,7 +3492,9 @@ function checkPadBatteries() {
 //    published checksums); Run-App.sh switches to it the next time.
 // Anything that fails leaves the app as it was; every step is in the log.
 const UPDATE_REPO = process.env.LUNA_REPO || 'rmach89/luna-batocera-hippos';
-const RELEASES_URL = process.env.LUNA_RELEASES_URL || `https://api.github.com/repos/${UPDATE_REPO}/releases/latest`;
+const UPDATE_BRANCH = process.env.LUNA_BRANCH || 'main';
+const VERSION_URL = process.env.LUNA_VERSION_URL || `https://raw.githubusercontent.com/${UPDATE_REPO}/${UPDATE_BRANCH}/system/add-ons/luna/app-source/package.json`;
+const TARBALL_URL = process.env.LUNA_TARBALL_URL || `https://codeload.github.com/${UPDATE_REPO}/tar.gz/refs/heads/${UPDATE_BRANCH}`;
 const UPDATE_STAGED = path.join(HOME, 'update-staged');
 let upd = { state: 'idle' };
 function updStatus(st) {
@@ -3526,12 +3529,12 @@ function runBuild(args, onLine, done) {
 function stagedAppVersion() {
   try { return fs.readFileSync(path.join(UPDATE_STAGED, 'ready'), 'utf8').trim(); } catch (e) { return ''; }
 }
-// the newest Release: { version, zip } (null with a reason when it can't be read)
+// the newest version on the branch: { version, url } ({ error } when it can't be read)
 function latestRelease() {
   return new Promise(resolve => {
     let req;
-    try { req = net.request({ url: RELEASES_URL, method: 'GET' }); } catch (e) { resolve({ error: e.message }); return; }
-    req.setHeader('Accept', 'application/vnd.github+json');
+    try { req = net.request({ url: VERSION_URL + '?t=' + Date.now(), method: 'GET' }); } catch (e) { resolve({ error: e.message }); return; }
+    req.setHeader('Cache-Control', 'no-cache');
     req.setHeader('User-Agent', 'luna-batocera-hippos/' + VERSION);
     const timer = setTimeout(() => { try { req.abort(); } catch (e) { /* ignore */ } resolve({ error: 'timed out' }); }, 20000);
     req.on('response', res => {
@@ -3539,13 +3542,11 @@ function latestRelease() {
       res.on('data', d => { body += d; });
       res.on('end', () => {
         clearTimeout(timer);
-        if (res.statusCode !== 200) { resolve({ error: res.statusCode === 404 ? 'no release published yet (HTTP 404)' : `HTTP ${res.statusCode}` }); return; }
+        if (res.statusCode !== 200) { resolve({ error: `HTTP ${res.statusCode}` }); return; }
         try {
-          const r = JSON.parse(body);
-          const version = String(r.tag_name || '').replace(/^[vV]/, '');
-          const asset = (r.assets || []).find(a => /\.zip$/i.test(String(a.name || '')));
-          if (!version || !asset) { resolve({ error: 'the newest release has no version tag or no zip' }); return; }
-          resolve({ version, zip: asset.browser_download_url });
+          const version = String(JSON.parse(body).version || '').replace(/^[vV]/, '');
+          if (!version) { resolve({ error: 'no version in the repository\'s package.json' }); return; }
+          resolve({ version, url: TARBALL_URL });
         } catch (e) { resolve({ error: 'GitHub\'s answer couldn\'t be read' }); }
       });
     });
@@ -3575,22 +3576,23 @@ function download(url, dest, onPct) {
     req.end();
   });
 }
-function unzip(zip, dir) {
+function untar(archive, dir) {
   const { execFileSync } = require('child_process');
-  execFileSync('python3', ['-I', '-c', 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])', zip, dir], { timeout: 120000 });
+  fs.mkdirSync(dir, { recursive: true });
+  execFileSync('tar', ['-xzf', archive, '-C', dir], { timeout: 180000 });
 }
 // download, unpack and check the newest app; ready for the next close
 async function stageApp(rel, onPct) {
   const work = UPDATE_STAGED + '.new';
   fs.rmSync(work, { recursive: true, force: true });
   fs.mkdirSync(work, { recursive: true });
-  const zip = path.join(work, 'update.zip');
+  const archive = path.join(work, 'update.tar.gz');
   try {
-    await download(rel.zip, zip, onPct);
+    await download(rel.url, archive, onPct);
   } catch (e) { fs.rmSync(work, { recursive: true, force: true }); throw new Error(`app download failed (${e.message})`); }
-  try { unzip(zip, path.join(work, 'pkg')); } catch (e) { fs.rmSync(work, { recursive: true, force: true }); throw new Error('the zip couldn\'t be unpacked'); }
-  fs.rmSync(zip, { force: true });
-  // the package: install.sh next to system/add-ons/luna with the app in it, of the version the release says
+  try { untar(archive, path.join(work, 'pkg')); } catch (e) { fs.rmSync(work, { recursive: true, force: true }); throw new Error('the download couldn\'t be unpacked'); }
+  fs.rmSync(archive, { force: true });
+  // the package: install.sh next to system/add-ons/luna with the app in it, of the version the check saw
   const find = (dir, depth) => {
     if (fs.existsSync(path.join(dir, 'install.sh'))) return dir;
     if (depth <= 0) return '';
@@ -3602,7 +3604,7 @@ async function stageApp(rel, onPct) {
   try { pv = JSON.parse(fs.readFileSync(path.join(root, 'system/add-ons/luna/app-source/package.json'), 'utf8')).version; } catch (e) { pv = ''; }
   if (!root || !fs.existsSync(path.join(root, 'system/add-ons/luna/app.asar')) || pv !== rel.version) {
     fs.rmSync(work, { recursive: true, force: true });
-    throw new Error(`the zip didn't look right (${!root ? 'no install.sh' : pv !== rel.version ? `it holds v${pv || '?'}, not v${rel.version}` : 'no app.asar'})`);
+    throw new Error(`the download didn't look right (${!root ? 'no install.sh' : pv !== rel.version ? `it holds v${pv || '?'}, not v${rel.version}` : 'no app.asar'})`);
   }
   fs.writeFileSync(path.join(work, 'ready'), rel.version + '\n');
   fs.rmSync(UPDATE_STAGED, { recursive: true, force: true });
@@ -3629,7 +3631,7 @@ async function checkForUpdates() {
   if (upd.state === 'checking' || upd.state === 'getting') return;
   const engine = 'v' + process.versions.electron;
   updStatus({ state: 'checking' });
-  log(`updates: checking (app v${VERSION} on GitHub ${UPDATE_REPO}, engine ${engine} on Electron)`);
+  log(`updates: checking (app v${VERSION} on GitHub ${UPDATE_REPO} ${UPDATE_BRANCH}, engine ${engine} on Electron)`);
   const [rel, eng] = await Promise.all([latestRelease(), engineCheck()]);
   if (rel.error) log(`updates: couldn't reach GitHub (${rel.error})`);
   if (eng.error) log(`updates: couldn't check the engine (${eng.error})`);

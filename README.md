@@ -2,7 +2,11 @@
 
 Play **Amazon Luna** from the EmulationStation carousel on [Batocera](https://batocera.org) and [HippOS](https://hippos-linux.org). Pick it, and a fullscreen app opens on [luna.amazon.com](https://luna.amazon.com), ready for your controller. Your Luna games can sit in EmulationStation's list like any other system, with their pictures and descriptions.
 
-**[⬇ Download the latest release](https://github.com/rmach89/luna-batocera-hippos/releases/latest)**
+**Install with one command** (in a terminal on Batocera or HippOS):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash
+```
 
 > **Unofficial project, use at your own risk.** Not affiliated with, endorsed by or sponsored by Amazon. Amazon, Amazon Luna, Luna and Prime are trademarks of Amazon.com, Inc. or its affiliates.
 
@@ -58,24 +62,21 @@ The welcome and Settings screens are the app's own; the F1 menu is a mock-up (Ba
 
 ## Install
 
-### From the zip
-
-1. Download the newest zip from **[Releases](https://github.com/rmach89/luna-batocera-hippos/releases/latest)**.
-2. Unzip it into the share folder (`/userdata`, called "share" on the network). That gives you `/userdata/Amazon Luna`.
-3. Open a terminal (on Batocera, F1 → Applications → xterm; or SSH in) and run:
-   ```bash
-   bash "/userdata/Amazon Luna/install.sh"
-   ```
-4. Answer its questions, then restart EmulationStation. Amazon Luna appears in the carousel.
-
-### With just the installer
-
-`install.sh` also works on its own. With nothing else next to it, it downloads the newest release from here, unpacks it into `/userdata/Amazon Luna` and installs it:
+Open a terminal (on Batocera, F1 → Applications → xterm; on HippOS, the desktop's terminal; or SSH in) and run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh -o /tmp/luna-install.sh
-bash /tmp/luna-install.sh
+curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash
 ```
+
+That's all. The installer does the rest by itself:
+
+- works out whether it's on **Batocera** or **HippOS** and which processor the device has (64-bit PC, 64-bit ARM or 32-bit ARM);
+- downloads the newest version straight from this repository (no zips, no releases to pick from) and deletes the download afterwards;
+- installs it in `/userdata/system/add-ons/luna`, adds the **luna** system to the carousel and the shortcuts to the applications menu, and gets the browser engine (Electron).
+
+Then restart EmulationStation. Amazon Luna appears in the carousel.
+
+**On HippOS** it follows HippOS's own way of doing things: everything goes in `/userdata` (which HippOS updates never touch), the shortcuts go in the desktop's applications menu, the files belong to HippOS's user (also when you run the installer as root), and any system library the browser engine needs is installed from HippOS's package sources, the same way HippOS installs Chromium for its web apps, so it stays after HippOS updates. Nothing is asked.
 
 The installer also works from BUA (Batocera Unofficial Add-ons): its questions appear on BUA's screen.
 
@@ -92,7 +93,7 @@ Luna's own pages follow the controller by themselves. If they don't on your setu
 ## Updating
 
 - **From the app:** Settings → Help and maintenance → **Updates**. One press checks for a newer app and a newer browser engine, and downloads whichever is newer. The new version is installed when you close the app; your sign-in, settings and picked games are kept.
-- **Or run the installer again.** To skip its update check: `LUNA_NO_UPDATE_CHECK=1 bash install.sh`.
+- **Or run the install command again.** It always gets the newest version from this repository.
 
 ## Controls
 

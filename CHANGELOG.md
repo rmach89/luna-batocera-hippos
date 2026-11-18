@@ -2,6 +2,12 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Download them from [Releases](https://github.com/rmach89/luna-batocera-hippos/releases).
 
+## 1.0.3
+
+- **One-command install, straight from the repository.** `curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/main/install.sh | bash` works out whether it's on Batocera or HippOS, downloads the newest version of the repository's main branch, installs it and cleans up. No zips and no releases any more; the old `/userdata/Amazon Luna` folder is removed if it's there.
+- **Updates come from the repository too:** Settings → Updates compares the app with the version on the main branch and downloads that.
+- **HippOS:** the installer refuses anything that isn't Batocera or HippOS; files made when it's run as root are handed to HippOS's user (1000:100), so EmulationStation and the app can use them; any system library the browser engine lacks is installed with apt from HippOS's package sources (HippOS keeps these across its updates).
+
 ## 1.0.2
 
 - **Signing in with a passkey account works.** The app's browser engine can't finish a passkey sign-in on Linux, so Amazon could leave you on a "use your passkey" or "scan this QR code" page with no way forward. The app now hides passkeys from Amazon's sign-in pages, so Amazon offers its password page (and its one-time code) instead. Your passkeys stay on your account for your other devices. To let Amazon offer them anyway: `"amazon_passkeys": true` in config.json.

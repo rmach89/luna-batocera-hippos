@@ -31,7 +31,7 @@ try:
 except Exception:
     pass' "$FILES/config.json" 2>/dev/null)"
 say "installing v$v (settings, profiles and sign-ins are kept)"
-LUNA_NO_UPDATE_CHECK=1 LUNA_SINGLE_LAUNCH="$single" bash "$inst" < /dev/null
+LUNA_FROM_GITHUB=1 LUNA_SINGLE_LAUNCH="$single" bash "$inst" < /dev/null
 rc=$?
 rm -rf "$WORK"
 if [ $rc -eq 0 ]; then say "v$v installed; it's used the next time the app opens"
