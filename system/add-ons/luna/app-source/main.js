@@ -3492,9 +3492,14 @@ function checkPadBatteries() {
 //    published checksums); Run-App.sh switches to it the next time.
 // Anything that fails leaves the app as it was; every step is in the log.
 const UPDATE_REPO = process.env.LUNA_REPO || 'rmach89/luna-batocera-hippos';
-const UPDATE_BRANCH = process.env.LUNA_BRANCH || 'main';
+// Installed pinned to a tag (install.sh with LUNA_REF writes "tag v1.0.4"
+// in update-ref): updates follow that tag, not main.
+const UPDATE_TAG = (() => {
+  try { const m = /^tag\s+(\S+)/.exec(fs.readFileSync(path.join(HOME, 'update-ref'), 'utf8')); return m && /^[\w.-]+$/.test(m[1]) ? m[1] : ''; } catch (e) { return ''; }
+})();
+const UPDATE_BRANCH = UPDATE_TAG || process.env.LUNA_BRANCH || 'main';
 const VERSION_URL = process.env.LUNA_VERSION_URL || `https://raw.githubusercontent.com/${UPDATE_REPO}/${UPDATE_BRANCH}/system/add-ons/luna/app-source/package.json`;
-const TARBALL_URL = process.env.LUNA_TARBALL_URL || `https://codeload.github.com/${UPDATE_REPO}/tar.gz/refs/heads/${UPDATE_BRANCH}`;
+const TARBALL_URL = process.env.LUNA_TARBALL_URL || `https://codeload.github.com/${UPDATE_REPO}/tar.gz/refs/${UPDATE_TAG ? 'tags' : 'heads'}/${UPDATE_BRANCH}`;
 const UPDATE_STAGED = path.join(HOME, 'update-staged');
 let upd = { state: 'idle' };
 function updStatus(st) {

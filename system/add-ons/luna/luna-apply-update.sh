@@ -31,7 +31,9 @@ try:
 except Exception:
     pass' "$FILES/config.json" 2>/dev/null)"
 say "installing v$v (settings, profiles and sign-ins are kept)"
-LUNA_FROM_GITHUB=1 LUNA_SINGLE_LAUNCH="$single" bash "$inst" < /dev/null
+# keep a pin to a tag (install.sh with LUNA_REF)
+tag="$(sed -n 's/^tag[[:space:]]\{1,\}\([A-Za-z0-9._-]\{1,\}\).*/\1/p' "$FILES/update-ref" 2>/dev/null | head -n1)"
+LUNA_FROM_GITHUB=1 LUNA_SINGLE_LAUNCH="$single" LUNA_REF="$tag" bash "$inst" < /dev/null
 rc=$?
 rm -rf "$WORK"
 if [ $rc -eq 0 ]; then say "v$v installed; it's used the next time the app opens"

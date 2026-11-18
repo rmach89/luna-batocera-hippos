@@ -174,6 +174,13 @@ for f in "$ROOT/system/add-ons/luna/"*; do
     fi
     cp -rf "$f" "$FILES/" || fail "Could not copy $name."
 done
+# pinned to a tag (LUNA_REF): the app's own updates follow that tag, not main
+if [ -n "$LUNA_REF" ]; then
+    echo "tag $LUNA_REF" > "$FILES/update-ref"
+    say "Pinned to $LUNA_REF: Settings > Updates follows that tag, not main."
+else
+    rm -f "$FILES/update-ref"
+fi
 # fix Windows line endings on the installer, in case the files were copied from a PC
 tr -d '\r' < "$FILES/Install-AmazonLuna.sh" > "$FILES/Install-AmazonLuna.sh.tmp" \
     && mv "$FILES/Install-AmazonLuna.sh.tmp" "$FILES/Install-AmazonLuna.sh"

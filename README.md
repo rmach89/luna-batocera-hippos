@@ -84,6 +84,8 @@ Then restart EmulationStation. Amazon Luna appears in the carousel.
 curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/v1.0.4/install.sh | LUNA_REF=v1.0.4 bash
 ```
 
+A pinned install stays on that tag: Settings → Updates follows the tag, not main. Running the install command without `LUNA_REF` goes back to following main.
+
 The installer also works from BUA (Batocera Unofficial Add-ons): its questions appear on BUA's screen.
 
 ## First start

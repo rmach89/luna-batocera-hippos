@@ -232,7 +232,7 @@ if [ -d "$FILES" ]; then
         # config.json, picked-games.json and the small "seen it" files)
         ( cd "$FILES" 2>/dev/null && rm -rf app.asar app-source lib launchsingle runtime runtime.old runtime.next runtime.new \
             electron-* theme-backups ./*.sh ./*.py es_systems_luna.cfg gamelist.xml luna.png luna1.png \
-            luna-icon.png luna-settings-icon.png luna-uninstall-icon.png luna-hippos.png luna-hippos-logo.sh hippos-theme-files.txt luna-apply-update.sh last-version luna-background.jpg luna-intro.mp4 luna-intro.webm luna-intro-frames.webp luna-intro-audio.ogg \
+            luna-icon.png luna-settings-icon.png luna-uninstall-icon.png luna-hippos.png luna-hippos-logo.sh hippos-theme-files.txt update-ref luna-apply-update.sh last-version luna-background.jpg luna-intro.mp4 luna-intro.webm luna-intro-frames.webp luna-intro-audio.ogg \
             README.txt added-to-list theme-installed.txt )
         if [ "$keep" = 2 ]; then
             # everyone's sign-in and profile go: the browser storage, the

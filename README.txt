@@ -74,7 +74,8 @@ same command again. Your sign-in, settings and picked games are kept.
 Options, set before "bash" (for example ... | LUNA_SINGLE_LAUNCH=yes bash):
   LUNA_SINGLE_LAUNCH=yes / no   answer the Launch Single Game question
   LUNA_BRANCH=name              install another branch of the repository
-  LUNA_REF=v1.0.4               install exactly that version (a git tag)
+  LUNA_REF=v1.0.4               install exactly that version (a git tag);
+                                Settings > Updates then follows that tag
 
 
 Using it
