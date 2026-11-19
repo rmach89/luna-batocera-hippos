@@ -1,7 +1,7 @@
 {
   "name": "luna-app",
   "productName": "Amazon Luna",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Locked-down Amazon Luna player for Batocera (unofficial)",
   "main": "main.js",
   "license": "MIT"

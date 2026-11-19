@@ -2,7 +2,7 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Each version is a git tag; install one with `LUNA_REF=<tag>` (see the README).
 
-## Unreleased
+## 1.0.8
 
 - **Fixes Luna's "Unsupported OS" when starting a game.** The user agent already said Chrome on Windows, but pages could still see Linux in `navigator.platform`, and `navigator.userAgentData` was missing altogether (no current Chrome lacks it). Every page, every frame from another site (sign-in, the game) and every background worker is now told it's Google Chrome on 64-bit Windows 11: user agent, `navigator.platform`, `navigator.userAgentData` and the `Sec-CH-UA` headers all agree.
 

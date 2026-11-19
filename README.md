@@ -78,10 +78,10 @@ Then restart EmulationStation. Amazon Luna appears in the carousel.
 
 **On HippOS** it follows HippOS's own way of doing things: everything goes in `/userdata` (which HippOS updates never touch), the shortcuts go in the desktop's applications menu, the files belong to HippOS's user (also when you run the installer as root), and nothing is ever written to HippOS's system area: no `sudo`, no `apt-get`. HippOS's built-in themes get the luna carousel art from HippOS itself; until your HippOS version has it, the carousel shows "Amazon Luna" as text. Nothing is asked.
 
-**A fixed version:** each version is also a git tag. To install exactly that version, put `LUNA_REF=v1.0.7` before `bash`:
+**A fixed version:** each version is also a git tag. To install exactly that version, put `LUNA_REF=v1.0.8` before `bash`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/v1.0.7/install.sh | LUNA_REF=v1.0.7 bash
+curl -fsSL https://raw.githubusercontent.com/rmach89/luna-batocera-hippos/v1.0.8/install.sh | LUNA_REF=v1.0.8 bash
 ```
 
 A pinned install stays on that tag: Settings → Updates follows the tag, not main. Running the install command without `LUNA_REF` goes back to following main.

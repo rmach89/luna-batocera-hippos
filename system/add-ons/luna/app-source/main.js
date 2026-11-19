@@ -3493,7 +3493,7 @@ function checkPadBatteries() {
 //    published checksums); Run-App.sh switches to it the next time.
 // Anything that fails leaves the app as it was; every step is in the log.
 const UPDATE_REPO = process.env.LUNA_REPO || 'rmach89/luna-batocera-hippos';
-// Installed pinned to a tag (install.sh with LUNA_REF writes "tag v1.0.7"
+// Installed pinned to a tag (install.sh with LUNA_REF writes "tag v1.0.8"
 // in update-ref): updates follow that tag, not main.
 const UPDATE_TAG = (() => {
   try { const m = /^tag\s+(\S+)/.exec(fs.readFileSync(path.join(HOME, 'update-ref'), 'utf8')); return m && /^[\w.-]+$/.test(m[1]) ? m[1] : ''; } catch (e) { return ''; }
