@@ -295,10 +295,11 @@ const isAllowed = url => rules.isAllowed(url, allowList);
 // keep this app's sign-in separate from anything else on the system
 app.setPath('userData', path.join(HOME, 'profile'));
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
-// Luna turns Linux browsers away. The user agent says Chrome on Windows
-// (cleanUserAgent), and the browser's "client hints" (which would still say
-// Linux) are turned off so the two agree.
-app.commandLine.appendSwitch('disable-features', 'UserAgentClientHint');
+// Luna turns Linux browsers away ("Unsupported OS"). Every page is told
+// it's Google Chrome on Windows, everywhere a page can look: the user agent,
+// navigator.platform, navigator.userAgentData and the Sec-CH-UA headers
+// (asWindows below). The client hints stay on: a Chrome without
+// navigator.userAgentData doesn't look like a current Chrome.
 // optional (Settings > GPU acceleration): ask Chromium to use the graphics
 // chip even where it normally wouldn't, including decoding the game's video
 // (VA-API). Read once at start, so a change applies the next time the app opens.
@@ -3817,7 +3818,60 @@ function applyUserAgent() {
   app.userAgentFallback = ua;
   try { curSession().setUserAgent(ua); } catch (e) { /* ignore */ }
   try { mainWin && mainWin.webContents.setUserAgent(ua); } catch (e) { /* ignore */ }
+  try { mainWin && asWindows(mainWin.webContents); } catch (e) { /* ignore */ }
 }
+// What Google Chrome on 64-bit Windows 11 tells pages about itself, beyond
+// the user agent (navigator.userAgentData, navigator.platform, Sec-CH-UA).
+function windowsHints() {
+  const full = process.versions.chrome, major = full.split('.')[0];
+  const brands = [{ brand: 'Google Chrome', version: major }, { brand: 'Chromium', version: major }, { brand: 'Not_A Brand', version: '24' }];
+  return {
+    brands, fullVersionList: brands.map(b => ({ brand: b.brand, version: b.brand === 'Not_A Brand' ? '24.0.0.0' : full })),
+    fullVersion: full, platform: 'Windows', platformVersion: '15.0.0', architecture: 'x86', model: '', mobile: false, bitness: '64', wow64: false,
+  };
+}
+// Tells one page (and every page it goes to) that this is Chrome on Windows,
+// through the browser's own developer protocol, which covers what a page
+// script and the request headers can see: in the page itself, in frames
+// from other sites (Luna's sign-in and game frames run in their own
+// process) and in background workers, each of which the protocol hands over
+// as it starts, held until it's been told.
+function windowsIdentity(dbg, over, note) {
+  const send = (m, p, sid) => dbg.sendCommand(m, p || {}, sid).catch(e => { note(`${m}: ${e.message}`); });
+  const auto = { autoAttach: true, waitForDebuggerOnStart: true, flatten: true };
+  if (!dbg.__lunaWin) {
+    dbg.__lunaWin = true;
+    dbg.on('message', (event, method, params) => {
+      if (method !== 'Target.attachedToTarget' || !params || !params.sessionId) return;
+      const sid = params.sessionId, type = (params.targetInfo || {}).type || '';
+      const page = type === 'iframe' || type === 'page';
+      Promise.all([
+        send(page ? 'Emulation.setUserAgentOverride' : 'Network.setUserAgentOverride', dbg.__lunaOver, sid),
+        page ? send('Target.setAutoAttach', auto, sid)
+          // a worker: its navigator.platform too, before its first line runs
+          : send('Runtime.evaluate', { expression: "try{Object.defineProperty(Object.getPrototypeOf(navigator),'platform',{get:function(){return 'Win32'},configurable:true})}catch(e){}" }, sid),
+      ]).then(() => send('Runtime.runIfWaitingForDebugger', {}, sid));
+    });
+  }
+  dbg.__lunaOver = over;
+  return Promise.all([send('Emulation.setUserAgentOverride', over), send('Target.setAutoAttach', auto)]);
+}
+function asWindows(wc) {
+  if (!wc || wc.isDestroyed() || !cfg.stream_as_windows || cfg.user_agent) return;
+  const dbg = wc.debugger;
+  try { if (!dbg.isAttached()) dbg.attach('1.3'); } catch (e) { log(`Windows identity: couldn't attach (${e.message})`); return; }
+  windowsIdentity(dbg, { userAgent: cleanUserAgent(), platform: 'Win32', userAgentMetadata: windowsHints() }, m => log(`Windows identity: ${m}`));
+}
+app.on('web-contents-created', (event, wc) => {
+  asWindows(wc);
+  // a page swapped into a new renderer keeps the setting, but set it again to be sure
+  wc.on('did-start-navigation', (e, url, inPage, isMain) => {
+    const main = e && typeof e.isMainFrame === 'boolean' ? e.isMainFrame : isMain;
+    const same = e && typeof e.isSameDocument === 'boolean' ? e.isSameDocument : inPage;
+    if (main && !same) asWindows(wc);
+  });
+  wc.debugger.on('detach', (e, reason) => log(`Windows identity: detached (${reason})`));
+});
 
 function blocked(wc, url, how) {
   log(`blocked (${how}): ${url}`);
