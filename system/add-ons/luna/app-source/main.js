@@ -239,7 +239,7 @@ function loadConfig(profileId) {
   cfg.dashboard_nav = cfg.dashboard_nav === true;
   cfg.amazon_passkeys = cfg.amazon_passkeys === true;
   if (!['off', 'all', 'picked'].includes(cfg.game_list)) cfg.game_list = 'off';
-  cfg.game_list_3d = false;
+  cfg.game_list_3d = cfg.game_list_3d === true;
   // Xbox Cloud Gaming's own tricks, which Luna doesn't have: always off here
   // (the settings stay in the code they came from, but nothing turns them on)
   Object.assign(cfg, LUNA_FIXED);
@@ -1093,7 +1093,7 @@ function settingsHtml() {
   // for Luna yet): never shown
   var NOT_ON_LUNA = ['row-user', 'row-unlock', 'row-boost', 'row-res', 'row-net', 'row-windows', 'row-ipv6', 'row-mic', 'row-steady', 'row-recon', 'row-alive', 'row-replay',
     'row-pg', 'row-vib', 'row-touch', 'row-split', 'row-rem',
-    'row-social', 'row-wait', 'row-splash', 'row-fb', 'row-anim', 'row-ana', 'row-g3d'];
+    'row-social', 'row-wait', 'row-splash', 'row-fb', 'row-anim', 'row-ana'];
   NOT_ON_LUNA.forEach(function (id) { var e = document.getElementById(id); if (e) e.style.display = 'none'; });
   Array.prototype.forEach.call(document.querySelectorAll('.sec[data-k="secDash"]'), function (e) { e.style.display = 'none'; });
   function buildRows() {
@@ -1103,10 +1103,10 @@ function settingsHtml() {
       .concat(['row-gpu', 'row-stats'])
       .concat(['row-sharpen'].concat(S.x64 ? ['row-up'].concat(S.up ? ['row-ut', 'row-us'] : []) : []).concat(['row-clean', 'row-clarity', 'row-ct', 'row-sa', 'row-br']))
       .concat(['row-controls', 'row-dnav', 'row-batt'])
-      .concat(['row-glist'].concat(S.game && GL[gi] === 'picked' ? ['row-gpick'] : []))
+      .concat(['row-glist'].concat(S.game && GL[gi] === 'picked' ? ['row-gpick'] : []).concat(GL[gi] !== 'off' ? ['row-g3d'] : []))
       .concat(S.reload ? ['row-reload'] : []).concat(['row-cache', 'row-logs', 'row-backup', 'row-restore', 'row-update', 'buttons']);
     LAST = rows.length - 1;
-    ['row-gpick', 'row-ut', 'row-us'].forEach(function (id) { document.getElementById(id).style.display = rows.indexOf(id) >= 0 ? 'flex' : 'none'; });
+    ['row-gpick', 'row-g3d', 'row-ut', 'row-us'].forEach(function (id) { document.getElementById(id).style.display = rows.indexOf(id) >= 0 ? 'flex' : 'none'; });
   }
   var copen = false;   // the Controls list is showing
   var row = 0, btn = 0, sent = false, confirmUntil = 0, confirmTimer = null;
@@ -1356,7 +1356,7 @@ function settingsHtml() {
        '&up=' + (S.up ? 1 : 0) + '&splash=' + (S.splash ? 1 : 0) + '&fb=' + (S.fb ? 1 : 0) + '&anim=' + (S.anim ? 1 : 0) + '&ana=' + (S.ana ? 1 : 0) +
        '&ut=' + S.ut + '&us=' + S.us + '&clean=' + (S.clean ? 1 : 0) + '&steady=' + (S.steady ? 1 : 0) + '&pg=' + (S.pg ? 1 : 0) + '&split=' + S.split +
        '&rem=' + (S.rem ? 1 : 0) + '&replay=' + (S.replay ? 1 : 0) + '&alive=' + (S.alive ? 1 : 0) + '&recon=' + (S.recon ? 1 : 0) +
-       '&ivol=' + S.ivol + '&imute=' + (S.imute ? 1 : 0) + '&vmute=' + (S.vmute ? 1 : 0) + '&soe=' + (S.soe ? 1 : 0) + '&glist=' + GL[gi] + '&g3d=0' + '&dnav=' + (S.dnav ? 1 : 0) +
+       '&ivol=' + S.ivol + '&imute=' + (S.imute ? 1 : 0) + '&vmute=' + (S.vmute ? 1 : 0) + '&soe=' + (S.soe ? 1 : 0) + '&glist=' + GL[gi] + '&g3d=' + (S.g3d ? 1 : 0) + '&dnav=' + (S.dnav ? 1 : 0) +
          (S.game ? '&gid=' + S.game.id + '&gslug=' + encodeURIComponent(S.game.slug) + '&gpick=' + (S.gpicked ? 1 : 0) : ''));
   }
   function cancel() { go('settings-cancel'); }

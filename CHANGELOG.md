@@ -2,6 +2,10 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Each version is a git tag; install one with `LUNA_REF=<tag>` (see the README).
 
+## Unreleased
+
+- **3D game boxes are back** (Settings → EmulationStation game list → 3D game boxes). Each case is drawn from the game's own picture on Luna, with the round Luna logo and AMAZON LUNA on top and the game's name on the spine. Only pictures that fit a case get one (a tall cover that loses at most a fifth of its width or height); a game with a wide banner picture keeps its flat picture. Drawn by `gamebox3d.py` with Pillow, or by the app itself when Pillow isn't there.
+
 ## 1.0.6
 
 - **HippOS: themes added later get the carousel art.** EmulationStation runs `luna-theme-art.sh` when it starts (from `/userdata/system/configs/emulationstation/scripts/start/`). It only touches `/userdata/themes`, never replaces a file a theme already has, and stops at once when no theme has changed since the last time. HippOS's built-in themes ship the luna art themselves. The uninstaller removes what it added.

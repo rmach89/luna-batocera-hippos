@@ -11,7 +11,10 @@ Options: --site luna.amazon.com (the Luna site of the region, default luna.amazo
 Each game gets a small file in /userdata/roms/luna (it holds the game's Luna
 ID, the B0... in its address, which the app opens), an entry in gamelist.xml
 with its name and description, and its picture, all from the game's own page
-on Luna.
+on Luna. With "3D game boxes" on in the app's Settings, a game whose picture
+fits a game case (a tall cover, not a wide banner) gets a 3D case drawn from
+it (gamebox3d.py, needs Pillow; without Pillow the app draws them); the others
+keep their flat picture.
 Only files this script made are ever removed; games' play counts and
 favourites set in Batocera are kept.
 
@@ -471,7 +474,126 @@ def ours(g):
     return False
 
 
-def list_games(info, got, state):
+# ---------- 3D game boxes ----------
+def image_size(path):
+    """(width, height) of a PNG, JPEG or WebP file, read from its header (no
+    Pillow needed), or None."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(64)
+            if head[:8] == b"\x89PNG\r\n\x1a\n":
+                return int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big")
+            if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+                kind = head[12:16]
+                if kind == b"VP8 ":
+                    return int.from_bytes(head[26:28], "little") & 0x3FFF, int.from_bytes(head[28:30], "little") & 0x3FFF
+                if kind == b"VP8L":
+                    b = int.from_bytes(head[21:25], "little")
+                    return (b & 0x3FFF) + 1, ((b >> 14) & 0x3FFF) + 1
+                if kind == b"VP8X":
+                    return int.from_bytes(head[24:27], "little") + 1, int.from_bytes(head[27:30], "little") + 1
+                return None
+            if head[:2] == b"\xff\xd8":
+                f.seek(2)
+                while True:
+                    m = f.read(2)
+                    if len(m) < 2 or m[0] != 0xFF:
+                        return None
+                    if m[1] in (0xD8, 0x01) or 0xD0 <= m[1] <= 0xD7:
+                        continue
+                    n = int.from_bytes(f.read(2), "big")
+                    if m[1] in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+                        b = f.read(5)
+                        return int.from_bytes(b[3:5], "big"), int.from_bytes(b[1:3], "big")
+                    f.seek(n - 2, 1)
+    except Exception:
+        pass
+    return None
+
+
+ART_RATIO = (640 - 2 * 11) / (960 - 86 - 5 - 11)   # gamebox3d.ART_RATIO
+MAX_CROP = 0.20                                    # gamebox3d.MAX_CROP
+BOX_VERSION = 1                                    # gamebox3d.VERSION, for when Pillow isn't here
+
+
+def fits_case(path):
+    """True when the picture is tall enough for a game case: it loses at most
+    a fifth of its width or height (gamebox3d.fits)."""
+    wh = image_size(path) if path else None
+    if not wh or not wh[0] or not wh[1]:
+        return False
+    r = wh[0] / wh[1]
+    lost = 1 - ART_RATIO / r if r > ART_RATIO else 1 - r / ART_RATIO
+    return lost <= MAX_CROP
+
+
+def make_boxes(info, got, state):
+    """{id: path of its 3D case} for the games whose picture fits a case; the
+    others keep their flat picture. Without Pillow the app draws them."""
+    covers = {}
+    for pid, d in info.items():
+        art = got.get(os.path.join(IMAGES, f"{pid}-image"))
+        if art and fits_case(art):
+            covers[pid] = art
+    skipped = len([p for p in info if got.get(os.path.join(IMAGES, f"{p}-image"))]) - len(covers)
+    if skipped:
+        emit(warning=f"{skipped} game(s) keep their flat picture: it doesn't fit a game case (too wide)")
+    sig = lambda p: f"{os.path.getsize(p)}:{int(os.path.getmtime(p))}"
+    done = state.setdefault("box_from", {})
+    try:
+        import gamebox3d
+        from PIL import Image
+    except Exception as e:
+        out, need = {}, []
+        for pid, art in covers.items():
+            box = os.path.join(IMAGES, f"{pid}-box3d.png")
+            if os.path.exists(box) and state.get("box3d_version") == BOX_VERSION and done.get(pid) == sig(art):
+                out[pid] = box
+            else:
+                if os.path.exists(box):
+                    out[pid] = box   # kept until the app has drawn the new one
+                need.append({"id": pid, "title": info[pid]["title"], "cover": art, "url": "", "out": box})
+                done[pid] = sig(art)
+        if need:
+            emit(warning=f"no Pillow here ({e}): the app draws the 3D game boxes", need_boxes=need)
+        state["box3d_version"] = BOX_VERSION
+        return out
+    if shutil.disk_usage(ROMS).free // (1024 * 1024) < 200:
+        emit(warning="3D game boxes skipped: less than 200 MB free")
+        return {}
+    try:
+        logo = Image.open(os.path.join(FILES, "luna-icon.png")).convert("RGBA")
+    except Exception:
+        logo = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+    redo = state.get("box3d_version") != gamebox3d.VERSION
+    out, n = {}, 0
+    for pid, art in covers.items():
+        n += 1
+        box = os.path.join(IMAGES, f"{pid}-box3d.png")
+        if os.path.exists(box) and not redo and done.get(pid) == sig(art):
+            out[pid] = box
+        else:
+            try:
+                im = Image.open(art)
+                im.load()
+                img = gamebox3d.make(im, info[pid]["title"], logo)
+                tmp = box + ".tmp.png"
+                img.save(tmp, optimize=True)
+                os.replace(tmp, box)
+                out[pid] = box
+                done[pid] = sig(art)
+            except Exception as err:
+                emit(warning=f"3D box for {info[pid]['title']}: {err}")
+        if n % 10 == 0 or n == len(covers):
+            emit(stage="boxes", done=n, total=len(covers))
+    for pid in list(done):
+        if pid not in covers:
+            del done[pid]
+    state["box3d_version"] = gamebox3d.VERSION
+    return out
+
+
+def list_games(info, got, state, boxes=None):
     """The games' entries in gamelist.xml (and their small files), with the pictures in got."""
     # the games no longer listed go (only ones this script made)
     gone = set(remove_ours(state, keep_ids=set(info)))
@@ -505,7 +627,9 @@ def list_games(info, got, state):
             p = got.get(os.path.join(IMAGES, f"{pid}-{kind}"))
             if p:
                 pics[kind] = "./images/" + os.path.basename(p)
-        sub(g, "image", pics.get("image"))
+        if boxes and boxes.get(pid):
+            pics["box3d"] = "./images/" + os.path.basename(boxes[pid])
+        sub(g, "image", pics.get("box3d") or pics.get("image"))
         sub(g, "thumbnail", pics.get("image"))
         sub(g, "fanart", pics.get("fanart"))
         before = old.get(rel)
@@ -622,7 +746,12 @@ def main():
         for kind in ("image", "fanart"):
             b = os.path.join(IMAGES, f"{pid}-{kind}")
             now[b] = have(b)
-    list_games(info, now, state)
+    # 3D boxes already drawn stay in the list meanwhile
+    boxes_now = {}
+    if read_json(CONFIG, {}).get("game_list_3d", False):
+        boxes_now = {pid: os.path.join(IMAGES, f"{pid}-box3d.png") for pid in info
+                     if os.path.exists(os.path.join(IMAGES, f"{pid}-box3d.png"))}
+    list_games(info, now, state, boxes_now)
     set_launchsingle(False, state)
     state.update(mode=mode, count=len(info), site=site)
     write_atomic(STATE, json.dumps(state, indent=2) + "\n")
@@ -646,10 +775,13 @@ def main():
             if n % 25 == 0 or n == len(jobs):
                 emit(stage="art", done=n, total=len(jobs))
 
-    list_games(info, got, state)
-    # pictures of games no longer listed (and 3D boxes / covers from older versions)
+    want3d = bool(read_json(CONFIG, {}).get("game_list_3d", False))
+    boxes = make_boxes(info, got, state) if want3d else {}
+    list_games(info, got, state, boxes)
+    # pictures of games no longer listed, 3D boxes no longer used (and covers
+    # from older versions)
     for f in os.listdir(IMAGES):
-        if f.endswith("-box3d.png") or f.endswith("-cover.jpg") or "-poster." in f or "-marquee." in f:
+        if (f.endswith("-box3d.png") and f[:10] not in boxes) or f.endswith("-cover.jpg") or "-poster." in f or "-marquee." in f:
             m = OUR_PICTURE.match(f)
             if m:
                 try:
@@ -658,8 +790,10 @@ def main():
                     pass
     sweep_pictures(keep_ids=set(info))
     set_launchsingle(False, state)
-    state.update(mode=mode, count=len(info), synced=time.time(), site=site, box3d=False)
-    state.pop("box3d_version", None)
+    state.update(mode=mode, count=len(info), synced=time.time(), site=site, box3d=bool(boxes))
+    if not want3d:
+        state.pop("box3d_version", None)
+        state.pop("box_from", None)
     write_atomic(STATE, json.dumps(state, indent=2) + "\n")
     open(CHANGED, "w").write(mode + "\n")
     emit(done=True, mode=mode, count=len(info))

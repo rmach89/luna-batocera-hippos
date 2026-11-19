@@ -49,7 +49,7 @@ fi
 
 # make sure the package files were copied over
 missing=""
-for f in luna.png luna-apply-update.sh luna-theme-art.sh luna-icon.png luna-uninstall-icon.png luna-settings-icon.png luna1.png es_systems_luna.cfg gamelist.xml Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py luna-service.sh config.json app.asar launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
+for f in luna.png luna-apply-update.sh luna-theme-art.sh luna-icon.png luna-uninstall-icon.png luna-settings-icon.png luna1.png es_systems_luna.cfg gamelist.xml Launch-AmazonLuna.sh Run-App.sh Return-To-Carousel.py uninstall.sh Uninstall-From-Menu.sh Build-Runtime.py Sync-GameList.py gamebox3d.py luna-service.sh config.json app.asar launchsingle/launchsingle-arm.sh launchsingle/launchsingle-launch.sh; do
     [ -s "$FILES/$f" ] || missing="$missing $f"
 done
 if [ -n "$missing" ]; then
