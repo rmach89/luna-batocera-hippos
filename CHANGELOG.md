@@ -2,11 +2,11 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Each version is a git tag; install one with `LUNA_REF=<tag>` (see the README).
 
-## Unreleased
+## 1.0.7
 
 - **3D game boxes are back** (Settings → EmulationStation game list → 3D game boxes). Each case is drawn from the game's own picture on Luna, with the round Luna logo and AMAZON LUNA on top and the game's name on the spine. Only pictures that fit a case get one (a tall cover that loses at most a fifth of its width or height); a game with a wide banner picture keeps its flat picture. Drawn by `gamebox3d.py` with Pillow, or by the app itself when Pillow isn't there.
 
-## Unreleased
+## 1.0.7
 
 - **3D game boxes are back** (Settings → EmulationStation game list → 3D game boxes). A game whose Luna picture fits a game case (a tall cover, losing at most a fifth of it) gets a black case with the Amazon Luna header, a purple line and its name on the spine; a game with a wide picture keeps its flat one. Drawn on the device from Luna's own pictures (with Pillow, or by the app when Pillow isn't there); nothing else is downloaded.
 
