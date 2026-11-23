@@ -35,7 +35,7 @@ What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 - **GPU acceleration** (including hardware video decoding), for devices that need it.
 
 **EmulationStation game list** (optional)
-- **All Luna games** (every game on Luna's own list of its games, about 100 right now), **Games I pick** (add a game with F8 or LB + RB + LT + RT on its Luna page), or **Off** (just the app itself).
+- **All Luna games** (every game on Luna's own list of its games, about 100 right now), **Games I pick** (add a game with F8 or by holding LT + RT (L2 + R2) on its Luna page), or **Off** (just the app itself).
 - Each game comes with its name, description and picture, from its own page on Luna. Picking a game opens the app on that game's page and presses Play for you.
 - The list updates itself every few days. A progress bar in the bottom-left corner shows how far an update has got, and an update carries on in the background if you close the app.
 - Amazon Luna itself always stays at the top of the list.
@@ -110,7 +110,7 @@ Luna's own pages follow the controller by themselves. If they don't on your setu
 | Exit back to EmulationStation | hold View + Menu (2 s) | hold Share/Create + Options | hold Esc |
 | Welcome screen and Settings | hold Menu (1 s) | hold Options | hold S |
 | Settings on Luna's pages | — | — | Backspace |
-| Add or remove the current game in EmulationStation's list | hold LB + RB + LT + RT | hold L1 + R1 + L2 + R2 | F8 |
+| Add or remove the current game in EmulationStation's list | hold LT + RT | hold L2 + R2 | F8 |
 | Quick settings in a game (volume and picture) | hold LB + RB + View (1 s) | hold L1 + R1 + Share/Create | F9 |
 | Screenshot in a game | Quick settings → Take a screenshot | the same | PrintScreen |
 | Back to Luna from a sign-in or account page | View | Share/Create | Home |

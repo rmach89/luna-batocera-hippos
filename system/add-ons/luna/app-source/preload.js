@@ -1043,16 +1043,16 @@ function sendPickToggle(how) {
     ipcRenderer.send('luna-pick-toggle', location.href, also, name);
   }
 }
-// LB + RB + LT + RT (L1 + R1 + L2 + R2) held together for a second on the
-// dashboard: this game into Batocera's list, like F8. A second's hold, so a
-// quick squeeze in a game doesn't do it; once per hold.
-const PICK_COMBO = [4, 5, 6, 7], PICK_HOLD_MS = 1000;
+// LT + RT (L2 + R2) held together for a second on a Luna page: this game
+// into EmulationStation's list, like F8. Never while a game is streaming
+// (racing games hold both triggers); a second's hold; once per hold.
+const PICK_COMBO = [6, 7], PICK_HOLD_MS = 1000;
 let pickSince = 0, pickDone = false;
 function checkPickCombo(s) {
-  if (!ON_DASH || OVERLAY_UP || osk.isOpen) { pickSince = 0; return; }
+  if (!ON_DASH || OVERLAY_UP || osk.isOpen || qpStreaming()) { pickSince = 0; return; }
   if (PICK_COMBO.every(b => s[b])) {
     if (!pickSince) pickSince = Date.now();
-    else if (!pickDone && Date.now() - pickSince >= PICK_HOLD_MS) { pickDone = true; sendPickToggle('LB + RB + LT + RT'); }
+    else if (!pickDone && Date.now() - pickSince >= PICK_HOLD_MS) { pickDone = true; sendPickToggle('LT + RT'); }
   } else { pickSince = 0; pickDone = false; }
 }
 

@@ -2,6 +2,10 @@
 
 Every version of the Amazon Luna add-on for Batocera and HippOS. Each version is a git tag; install one with `LUNA_REF=<tag>` (see the README).
 
+## Unreleased
+
+- **Adding a game to "Games I pick" with the controller is now LT + RT (L2 + R2)**, held for a second on the game's Luna page (was LB + RB + LT + RT). It never fires while a game is streaming, so holding both triggers in a game is safe. F8 still works.
+
 ## 1.0.8
 
 - **Fixes Luna's "Unsupported OS" when starting a game.** The user agent already said Chrome on Windows, but pages could still see Linux in `navigator.platform`, and `navigator.userAgentData` was missing altogether (no current Chrome lacks it). Every page, every frame from another site (sign-in, the game) and every background worker is now told it's Google Chrome on 64-bit Windows 11: user agent, `navigator.platform`, `navigator.userAgentData` and the `Sec-CH-UA` headers all agree.

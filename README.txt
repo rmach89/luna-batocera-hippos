@@ -165,7 +165,7 @@ from its page on Luna. Amazon Luna itself stays at the top of the list.
   All Luna games  every game on Luna's own list of its games (its public
                   site map, the list it gives search engines)
   Games I pick    only the games you add: open a game's page on Luna,
-                  then press F8, or hold LB + RB + LT + RT for a second.
+                  then press F8, or hold LT + RT (L2 + R2) for a second.
                   The same again takes it out.
 
 Picking a game in EmulationStation opens the app on that game's page and
