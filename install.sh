@@ -108,12 +108,12 @@ fi
 # Only when this script sits in a full copy of the repository (a git clone)
 # does it install that copy instead (for testing changes).
 # LUNA_REPO / LUNA_BRANCH pick another repository or branch.
-# LUNA_REF=v1.0.8 installs that tagged version instead (a git tag, no zip):
+# LUNA_REF=v1.0.9 installs that tagged version instead (a git tag, no zip):
 # for anyone who wants a fixed version, such as a HippOS catalog entry.
 REPO="${LUNA_REPO:-rmach89/luna-batocera-hippos}"
 BRANCH="${LUNA_BRANCH:-main}"
 if [ -n "$LUNA_REF" ]; then
-    case "$LUNA_REF" in *[!A-Za-z0-9._-]*) fail "LUNA_REF must be a tag such as v1.0.8." ;; esac
+    case "$LUNA_REF" in *[!A-Za-z0-9._-]*) fail "LUNA_REF must be a tag such as v1.0.9." ;; esac
     TARBALL="${LUNA_TARBALL_URL:-https://codeload.github.com/$REPO/tar.gz/refs/tags/$LUNA_REF}"
     BRANCH="tag $LUNA_REF"
 else
