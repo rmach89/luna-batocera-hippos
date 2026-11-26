@@ -26,6 +26,10 @@ OS=batocera
 TRIGGER=""
 # a game from Batocera's list (Settings > Batocera game list): its ID
 GAME_ARG=""
+# the " Amazon Luna Settings" entry: the settings screen, like the F1 shortcut
+if [ "$1" = "--from-es" ] && [ "$(basename "$2")" = "Amazon Luna Settings.luna" ]; then
+    set -- --settings
+fi
 if [ "$1" = "--from-es" ] && [ -f "$2" ]; then
     id="$(head -c 64 "$2" | tr -d '\r\n[:space:]')"
     if printf '%s' "$id" | grep -qE '^[0-9A-Z]{10}$'; then

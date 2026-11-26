@@ -120,8 +120,10 @@ cp -f "$FILES/es_systems_luna.cfg" "$ES/es_systems_luna.cfg"
 
 # one placeholder "game", its name and your artwork
 echo "Placeholder for Amazon Luna. Launching it opens the Amazon Luna app." > "$ROMS/$GAME"
-# the game list: the app's entry (description, developer, genre, players...)
-# replaces an older one; anything else already in the list is kept
+echo "Placeholder for Amazon Luna's settings. Launching it opens the app's settings screen." > "$ROMS/Amazon Luna Settings.luna"
+# the game list: the app's entries (" Amazon Luna" and " Amazon Luna
+# Settings": description, developer, genre, players...) replace older ones;
+# anything else already in the list is kept
 if [ ! -f "$ROMS/gamelist.xml" ]; then
     cp "$FILES/gamelist.xml" "$ROMS/gamelist.xml"
 else
@@ -129,17 +131,18 @@ else
 import re, sys
 mine, ours = sys.argv[1], sys.argv[2]
 text = open(mine, encoding="utf-8", errors="replace").read()
-entry = re.search(r"[ \t]*<game>.*?</game>\s*", open(ours, encoding="utf-8").read(), re.S).group(0)
+entries = "".join(re.findall(r"[ \t]*<game>.*?</game>\s*", open(ours, encoding="utf-8").read(), re.S))
 if "</gameList>" not in text:
     raise SystemExit(1)
-# drop the old entry for the app (by its path), keep the rest
-text = re.sub(r"[ \t]*<game>(?:(?!</game>).)*?<path>\./Amazon Luna\.luna</path>.*?</game>\s*", "", text, flags=re.S)
-text = text.replace("</gameList>", entry + "</gameList>", 1)
+# drop the old entries for the app and its settings (by their paths), keep the rest
+text = re.sub(r"[ \t]*<game>(?:(?!</game>).)*?<path>\./Amazon Luna(?: Settings)?\.luna</path>.*?</game>\s*", "", text, flags=re.S)
+text = text.replace("</gameList>", entries + "</gameList>", 1)
 open(mine, "w", encoding="utf-8").write(text)
 GAMELIST_EOF
 fi
 # the entry's picture (screenshot/thumbnail): the cloud icon, square, fits the tile
 cp -f "$FILES/luna-icon.png" "$ROMS/images/luna.png"
+cp -f "$FILES/luna-settings-icon.png" "$ROMS/images/luna-settings.png"
 
 # launch-single-game allow-list (only when it was chosen)
 if [ "$SINGLE" != yes ]; then
@@ -166,6 +169,24 @@ luna
 LIST_EOF
     touch "$FILES/added-to-list"
     echo "Created $LIST with luna."
+fi
+
+# " Amazon Luna Settings" in luna's list, except when Launch Single Game
+# opens the app the moment luna is picked: it only does that with a single
+# file in the folder, and the list is never seen then anyway (Settings is in
+# the app and in F1 > Applications)
+LS_SCRIPT="$ES/scripts/game-selected/launchsingle-launch.sh"
+if [ -f "$LS_SCRIPT" ] && { [ ! -f "$LIST" ] || tr -d '\r' < "$LIST" | grep -qx '[[:space:]]*luna[[:space:]]*'; } \
+   && ! grep -qE '"game_list": *"(all|picked)"' "$FILES/config.json" 2>/dev/null; then
+    rm -f "$ROMS/Amazon Luna Settings.luna"
+    python3 - "$ROMS/gamelist.xml" <<'NOSETTINGS_EOF' 2>/dev/null
+import re, sys
+p = sys.argv[1]
+t = open(p, encoding="utf-8").read()
+t = re.sub(r"[ \t]*<game>(?:(?!</game>).)*?<path>\./Amazon Luna Settings\.luna</path>.*?</game>\s*", "", t, flags=re.S)
+open(p, "w", encoding="utf-8").write(t)
+NOSETTINGS_EOF
+    echo "Launch Single Game opens the app straight away, so luna's list has no Settings entry (Settings: in the app, or F1 > Applications)."
 fi
 
 # links from an earlier install come down first (copying onto one of
@@ -316,7 +337,7 @@ if [ -f "$FILES/gamelist-state.json" ] && [ -f "$FILES/Sync-GameList.py" ]; then
     python3 "$FILES/Sync-GameList.py" off >/dev/null 2>&1 && echo "Removed the games from Batocera's list."
 fi
 rm -f "$ES/es_systems_luna.cfg"
-rm -f "$ROMS/Amazon Luna.luna" "$ROMS/gamelist.xml" "$ROMS/images/luna.png"
+rm -f "$ROMS/Amazon Luna.luna" "$ROMS/Amazon Luna Settings.luna" "$ROMS/gamelist.xml" "$ROMS/images/luna.png" "$ROMS/images/luna-settings.png"
 rmdir "$ROMS/images" "$ROMS" 2>/dev/null
 
 # take luna off the allow-list, only if the installer put it there

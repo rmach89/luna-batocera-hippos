@@ -42,6 +42,7 @@ STATE = os.path.join(FILES, "gamelist-state.json")
 PICKED = os.path.join(FILES, "picked-games.json")
 CONFIG = os.path.join(FILES, "config.json")
 LS_LIST = os.environ.get("LUNA_LAUNCHSINGLE_LIST", "/userdata/system/launchsingle.systems")
+LS_SCRIPT = os.environ.get("LUNA_LAUNCHSINGLE_SCRIPT", "/userdata/system/configs/emulationstation/scripts/game-selected/launchsingle-launch.sh")
 CHANGED = os.environ.get("LUNA_GAMELIST_FLAG", "/tmp/luna-gamelist-changed")
 APP_LOG = os.environ.get("LUNA_APP_LOG", "/userdata/system/logs/luna-app.log")
 LOCK = os.path.join(FILES, ".gamelist.lock")
@@ -52,6 +53,8 @@ SITE_RE = re.compile(r"^luna\.amazon\.(com|ca|co\.uk|de|fr|it|es|nl|pl|com\.be|p
 SITEMAP = os.environ.get("LUNA_SITEMAP_URL", "")          # (for the tests: instead of https://<site>/sitemap.xml)
 PAGE_URL = os.environ.get("LUNA_PAGE_URL", "")            # (for the tests: "{base}/{slug}/{id}" instead of the site)
 DASHBOARD = "./Amazon Luna.luna"
+SETTINGS_ENTRY = "./Amazon Luna Settings.luna"
+OWN = (DASHBOARD, SETTINGS_ENTRY)   # the app's own entries, always in the list
 # a browser's way of asking (Luna's pages turn some programs away)
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 # a Luna game's ID: the 10 letters and digits at the end of its address (an Amazon ASIN, B0...)
@@ -352,8 +355,25 @@ def sized(url, w):
 
 
 # ---------- gamelist.xml ----------
-def load_gamelist():
-    """Batocera's list as it is (a damaged one is left alone), with the app's own entry."""
+def single_launched():
+    """True when Launch Single Game opens the app as soon as luna is picked in
+    the carousel. It only does that with a single file in the folder, so then
+    there's no " Amazon Luna Settings" entry (its list is never seen anyway;
+    Settings is in the app and in F1 > Applications)."""
+    if not os.path.exists(LS_SCRIPT):
+        return False
+    try:
+        lines = open(LS_LIST, encoding="utf-8").read().replace("\r", "").split("\n")
+    except FileNotFoundError:
+        return True   # no list: it acts on every system
+    except Exception:
+        return False
+    return any(l.strip() == "luna" for l in lines if not l.strip().startswith("#"))
+
+
+def load_gamelist(with_settings=True):
+    """Batocera's list as it is (a damaged one is left alone), with the app's
+    own entries: " Amazon Luna" and (with_settings) " Amazon Luna Settings"."""
     if os.path.exists(GAMELIST):
         try:
             root = ET.parse(GAMELIST).getroot()
@@ -361,10 +381,30 @@ def load_gamelist():
             raise RuntimeError(f"{GAMELIST} couldn't be read ({e}); it was left as it is")
     else:
         root = ET.Element("gameList")
-    if not any((g.findtext("path") or "") == DASHBOARD for g in root.findall("game")):
+    have = {g.findtext("path") or "" for g in root.findall("game")}
+    try:
+        ours = ET.parse(os.path.join(FILES, "gamelist.xml")).getroot().findall("game")
+    except Exception:
+        ours = []
+    for i, g in enumerate(ours):
+        p = g.findtext("path") or ""
+        if p not in have and (with_settings or p != SETTINGS_ENTRY):
+            root.insert(i, g)
+    # the settings entry's placeholder file, so EmulationStation lists it
+    settings_file = os.path.join(ROMS, SETTINGS_ENTRY[2:])
+    if with_settings and not os.path.exists(settings_file):
         try:
-            root.insert(0, ET.parse(os.path.join(FILES, "gamelist.xml")).getroot().find("game"))
-        except Exception:
+            with open(settings_file, "w", encoding="utf-8") as f:
+                f.write("Placeholder for Amazon Luna's settings. Launching it opens the app's settings screen.\n")
+        except OSError:
+            pass
+    elif not with_settings:
+        for g in list(root.findall("game")):
+            if (g.findtext("path") or "") == SETTINGS_ENTRY:
+                root.remove(g)
+        try:
+            os.remove(settings_file)
+        except OSError:
             pass
     return root
 
@@ -373,19 +413,21 @@ PINNED = " Amazon Luna"   # a space first: it sorts before every letter, number 
 
 
 def pin_first(g):
-    """The app's own entry stays at the top of the list: its sort name for
-    EmulationStation versions that use one (Batocera since December 2025, HippOS),
-    and its name for the ones that sort by the name itself; both start with a space."""
+    """The app's own entries stay at the top of the list (" Amazon Luna", then
+    " Amazon Luna Settings"): their sort name for EmulationStation versions
+    that use one (Batocera since December 2025, HippOS), and their name for
+    the ones that sort by the name itself; both start with a space."""
+    pinned = PINNED + (" Settings" if (g.findtext("path") or "") == SETTINGS_ENTRY else "")
     sn = g.find("sortname")
     if sn is None:
-        sub(g, "sortname", PINNED)
+        sub(g, "sortname", pinned)
     elif not (sn.text or "").startswith(" "):   # "!Amazon Luna" from earlier versions
-        sn.text = PINNED
+        sn.text = pinned
     n = g.find("name")
     if n is None:
         n = ET.SubElement(g, "name")
     if not (n.text or "").startswith(" "):
-        n.text = " " + (n.text or "Amazon Luna").strip()
+        n.text = " " + (n.text or pinned).strip()
 
 
 def sub(game, tag, text):
@@ -604,7 +646,7 @@ def list_games(info, got, state, boxes=None):
         if p in gone or any(p == v.get("file") for v in state["games"].values()):
             old[p] = g
             root.remove(g)
-        elif p == DASHBOARD:
+        elif p in OWN:
             pin_first(g)
 
     used = {os.path.basename(v.get("file", "")) for v in state["games"].values()}
@@ -701,14 +743,15 @@ def main():
 
     if mode == "off":
         gone = set(remove_ours(state))
-        root = load_gamelist()
-        # Off: just the app itself in the list. Every other entry goes, and every
+        set_launchsingle(True, state)
+        root = load_gamelist(with_settings=not single_launched())
+        # Off: just the app itself (and its settings) in the list. Every other entry goes, and every
         # other game file in the folder (EmulationStation would list it again)
         for g in list(root.findall("game")):
-            if (g.findtext("path") or "") != DASHBOARD:
+            if (g.findtext("path") or "") not in OWN:
                 root.remove(g)
         for f in os.listdir(ROMS):
-            if f.lower().endswith(".luna") and "./" + f != DASHBOARD:
+            if f.lower().endswith(".luna") and "./" + f not in OWN:
                 try:
                     os.remove(os.path.join(ROMS, f))
                 except OSError as err:
@@ -717,7 +760,6 @@ def main():
         swept = sweep_pictures()
         if swept:
             emit(warning=f"deleted {swept} downloaded pictures")
-        set_launchsingle(True, state)
         state.update(mode="off", count=0, synced=time.time())
         state.pop("details", None)
         write_atomic(STATE, json.dumps(state, indent=2) + "\n")

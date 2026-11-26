@@ -19,4 +19,16 @@ Unofficial app for Batocera; not made by or affiliated with Amazon.</desc>
     <players>1-4</players>
     <lang>en</lang>
   </game>
+  <game>
+    <path>./Amazon Luna Settings.luna</path>
+    <name> Amazon Luna Settings</name>
+    <sortname> Amazon Luna Settings</sortname>
+    <desc>The Amazon Luna app's settings: region and language, picture and sound, the 4K upscaler, the EmulationStation game list and 3D game boxes, your controller's buttons, updates, backup and more. Opens the settings screen straight away, without starting Luna.</desc>
+    <image>./images/luna-settings.png</image>
+    <thumbnail>./images/luna-settings.png</thumbnail>
+    <developer>Amazon</developer>
+    <publisher>Amazon</publisher>
+    <genre>Settings</genre>
+    <lang>en</lang>
+  </game>
 </gameList>

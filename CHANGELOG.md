@@ -4,6 +4,7 @@ Every version of the Amazon Luna add-on for Batocera and HippOS. Each version is
 
 ## Unreleased
 
+- **" Amazon Luna Settings" in luna's game list**, right under " Amazon Luna": it opens the app's settings screen straight away, like the F1 > Applications shortcut. It's left out only when Launch Single Game opens the app the moment luna is picked (that needs a single entry, and the list isn't seen then).
 - **Adding a game to "Games I pick" with the controller is now LT + RT (L2 + R2)**, held for a second on the game's Luna page (was LB + RB + LT + RT). It never fires while a game is streaming, so holding both triggers in a game is safe. F8 still works.
 
 ## 1.0.8

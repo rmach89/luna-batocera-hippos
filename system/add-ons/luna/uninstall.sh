@@ -161,7 +161,7 @@ elif [ -f "$PORTS/Uninstall Amazon Luna.sh" ]; then
 else
     say "Amazon Luna's uninstaller wasn't found; removing its files directly..."
     rm -f "$ES/es_systems_luna.cfg"
-    rm -f "$USERDATA/roms/luna/Amazon Luna.luna" "$USERDATA/roms/luna/gamelist.xml" "$USERDATA/roms/luna/images/luna.png"
+    rm -f "$USERDATA/roms/luna/Amazon Luna.luna" "$USERDATA/roms/luna/Amazon Luna Settings.luna" "$USERDATA/roms/luna/gamelist.xml" "$USERDATA/roms/luna/images/luna.png" "$USERDATA/roms/luna/images/luna-settings.png"
     rmdir "$USERDATA/roms/luna/images" "$USERDATA/roms/luna" 2>/dev/null
     rm -rf "$FILES/runtime" "$FILES/runtime.old" "$FILES/runtime.next" "$FILES/update-staged" "$FILES/update-staged.new"
     rm -f "$USERDATA/system/.local/share/applications/luna-amazon-luna.desktop" \

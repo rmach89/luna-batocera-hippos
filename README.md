@@ -72,7 +72,7 @@ That's all. The installer does the rest by itself:
 
 - works out whether it's on **Batocera** or **HippOS** and which processor the device has (64-bit PC, 64-bit ARM or 32-bit ARM);
 - downloads the newest version straight from this repository (no zips, no releases to pick from) and deletes the download afterwards;
-- installs it in `/userdata/system/add-ons/luna`, adds the **luna** system to the carousel and the shortcuts to the applications menu, and gets the browser engine (Electron).
+- installs it in `/userdata/system/add-ons/luna`, adds the **luna** system to the carousel (with **Amazon Luna** and **Amazon Luna Settings** at the top of its list) and the shortcuts to the applications menu, and gets the browser engine (Electron).
 
 Then restart EmulationStation. Amazon Luna appears in the carousel.
 
